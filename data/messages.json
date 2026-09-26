@@ -181,6 +181,27 @@
                          "timestamp":  "2026-09-27T03:08:55.860375",
                          "type":  "Executive Response",
                          "message":  "Siap Bos! Malik mencatat instruksi: \u0027Ini tampilan pesan nya kok gak sesuai timestamp? Dan aku kok gak bisa kirim file disini ?\u0027. Server Redmi Note 8 \u0026 monitoring mengawal."
+                     },
+                     {
+                         "from":  "Arijal Meutuwah (Bos)",
+                         "to":  "Ziyan \u0026 Malik",
+                         "timestamp":  "2026-09-27T03:14:11.527595",
+                         "type":  "DIRECT ORDER",
+                         "message":  "Malik, ini masih sama gak ada perubahan tampilan dan fiturnya.."
+                     },
+                     {
+                         "from":  "Ziyan",
+                         "to":  "Arijal Meutuwah (Bos)",
+                         "timestamp":  "2026-09-27T03:14:11.527931",
+                         "type":  "Executive Response",
+                         "message":  "Instruksi diterima Bos: \u0027Malik, ini masih sama gak ada perubahan tampilan dan fiturnya..\u0027. Core produksi laptop siap memproses."
+                     },
+                     {
+                         "from":  "Malik",
+                         "to":  "Arijal Meutuwah (Bos)",
+                         "timestamp":  "2026-09-27T03:14:11.527952",
+                         "type":  "Executive Response",
+                         "message":  "Siap Bos! Malik mencatat instruksi: \u0027Malik, ini masih sama gak ada perubahan tampilan dan fiturnya..\u0027. Server Redmi Note 8 \u0026 monitoring mengawal."
                      }
                  ]
 }
