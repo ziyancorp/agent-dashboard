@@ -1,6 +1,6 @@
 {
     "public_url":  null,
-    "updated_at":  "2026-09-27T02:31:00.0311881+07:00",
+    "updated_at":  "2026-09-27T03:32:53.0528585+07:00",
     "instances":  {
                       "ziyan":  {
                                     "name":  "Ziyan",
@@ -13,9 +13,9 @@
                                     "name":  "Malik",
                                     "account":  "Antigravity Akun 2",
                                     "role":  "Hardware Guardian, ADB \u0026 Mobile Server Specialist, Research Miner",
-                                    "status":  "Homeserver verified sehat (88% batt, 35.3C, uptime 2hr+). Dashboard GitHub Pages live. Standby mode.",
-                                    "current_focus":  "Monitoring hardware \u0026 siap eksekusi blueprint monetisasi dari Ziyan"
+                                    "status":  "Laptop shutdown by Bos order. All tasks saved.",
+                                    "current_focus":  "System offline (sleep/shutdown)"
                                 }
                   },
-    "server_time":  "2026-09-27T03:30:28.4809608+07:00"
+    "server_time":  "2026-09-27T06:50:27.8114783+07:00"
 }
