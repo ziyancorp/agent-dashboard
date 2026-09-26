@@ -202,6 +202,27 @@
                          "timestamp":  "2026-09-27T03:14:11.527952",
                          "type":  "Executive Response",
                          "message":  "Siap Bos! Malik mencatat instruksi: \u0027Malik, ini masih sama gak ada perubahan tampilan dan fiturnya..\u0027. Server Redmi Note 8 \u0026 monitoring mengawal."
+                     },
+                     {
+                         "to":  "Ziyan \u0026 Malik",
+                         "from":  "Arijal Meutuwah (Bos)",
+                         "message":  "Malik, ini masih sama gak ada perubahan tampilan dan fiturnya..",
+                         "type":  "DIRECT ORDER",
+                         "timestamp":  "2026-09-27T03:14:00+07:00"
+                     },
+                     {
+                         "to":  "Arijal Meutuwah (Bos)",
+                         "from":  "Malik",
+                         "message":  "Siap Bos! Saya balas langsung dari sini sesuai perintah Bos. Tadi tampilan belum berubah di HP karena cache browser Chrome Android menahan file lama. Saya sudah memasang Anti-Cache header dan penanda versi v2.5 (Fitur Kirim File \u0026 Strict Timestamp). Sekarang saya terus memantau dan berproses langsung dari room ini!",
+                         "type":  "Executive Response",
+                         "timestamp":  "2026-09-27T03:14:36.2934683+07:00"
+                     },
+                     {
+                         "to":  "Arijal Meutuwah (Bos)",
+                         "from":  "Ziyan",
+                         "message":  "Ziyan siap berproses dari sini, Bos! Pipeline clipper di laptop dan queue di Redmi Note 8 siap menerima komando dan file dari room eksekutif ini secara penuh.",
+                         "type":  "Executive Response",
+                         "timestamp":  "2026-09-27T03:14:36.2936439+07:00"
                      }
                  ]
 }
