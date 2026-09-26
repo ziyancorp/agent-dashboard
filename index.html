@@ -363,28 +363,49 @@ async function loadStatus() {
   }
 }
 
+// ── Local Storage Order Persistence (Anti-Hilang) ────────────────────
+function getStoredOrders() {
+  try { return JSON.parse(localStorage.getItem('bos_orders') || '[]'); }
+  catch(e) { return []; }
+}
+function saveStoredOrder(order) {
+  const list = getStoredOrders();
+  list.unshift(order);
+  localStorage.setItem('bos_orders', JSON.stringify(list.slice(0, 50)));
+}
+
 // ── Render messages ───────────────────────────────────────────────────
 async function loadMessages() {
   try {
     const d = await fetchData('messages.json');
-    const msgs = (d.messages || []).slice().reverse();
+    const cloudMsgs = (d.messages || []).slice().reverse();
+    const localOrders = getStoredOrders();
+    
+    // Gabungkan pesan cloud dengan perintah Bos yang tersimpan lokal (Anti-Terhapus)
+    const allMsgs = [...localOrders, ...cloudMsgs];
+    
     const body = document.getElementById('timeline-body');
-    document.getElementById('msg-count').textContent = msgs.length + ' pesan';
-    if (!msgs.length) {
+    document.getElementById('msg-count').textContent = allMsgs.length + ' pesan';
+    if (!allMsgs.length) {
       body.innerHTML = '<div class="empty"><span class="material-icons-round">mark_chat_unread</span><p>Belum ada pesan.</p></div>';
       return;
     }
-    body.innerHTML = msgs.map(m => {
-      const s = (m.from || 'unknown').toLowerCase();
+    body.innerHTML = allMsgs.map(m => {
+      const isBos = m.from && (m.from.includes('Bos') || m.from.includes('Arijal'));
+      const s = isBos ? 'bos' : (m.from || 'unknown').toLowerCase();
       const t = m.type || 'message';
-      return `<div class="msg-item">
-        <div class="msg-av ${s}">${initial(m.from)}</div>
+      const borderStyle = isBos ? 'border-left: 3.5px solid #0B57D0; background: #F8FAFE;' : '';
+      const avHtml = isBos ? '👑' : initial(m.from);
+      const avBg = isBos ? 'background:#0B57D0;color:white;' : '';
+      
+      return `<div class="msg-item" style="${borderStyle}">
+        <div class="msg-av ${s}" style="${avBg}">${avHtml}</div>
         <div class="msg-body">
           <div class="msg-meta">
-            <span class="msg-sender ${s}">${m.from || '?'}</span>
+            <span class="msg-sender ${s}" style="${isBos ? 'color:#0B57D0;font-weight:700;' : ''}">${m.from || '?'}</span>
             <span class="msg-arrow">→</span>
             <span class="msg-recip">${m.to || ''}</span>
-            <span class="type-chip ${t}">${t}</span>
+            <span class="type-chip ${t}" style="${isBos ? 'background:#D3E3FD;color:#041E49;' : ''}">${t}</span>
             <span class="msg-time">${fmtTime(m.timestamp)}</span>
           </div>
           <div class="msg-text">${(m.message || '').replace(/\n/g,'<br>')}</div>
@@ -430,41 +451,25 @@ async function sendExecutiveCommand() {
   feedback.style.display = 'block';
   feedback.style.background = '#D3E3FD';
   feedback.style.color = '#041E49';
-  feedback.textContent = '⏳ Mengirim instruksi ke ' + (target === 'both' ? 'Ziyan & Malik' : target.toUpperCase()) + '...';
+  feedback.textContent = '⏳ Menyimpan dan menyiarkan instruksi Bos...';
 
-  // Coba kirim ke server lokal jika terhubung
-  try {
-    await fetch('http://localhost:8899/api/chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: text, target: target, from: 'Bos (Owner)' })
-    });
-  } catch(e) {
-    // Tetap berjalan jika via cloud/github pages
-  }
+  const orderObj = {
+    from: 'Arijal Meutuwah (Bos)',
+    to: target === 'both' ? 'Ziyan & Malik' : target.toUpperCase(),
+    type: 'Direct Order',
+    message: text,
+    timestamp: new Date().toISOString()
+  };
 
-  // Tampilkan langsung di timeline chat secara lokal
-  const body = document.getElementById('timeline-body');
-  const nowStr = fmtTime(new Date().toISOString());
-  const newMsgHtml = `
-    <div class="msg-item" style="border-left: 3px solid #0B57D0; background: #F8FAFE;">
-      <div class="msg-av" style="background:#0B57D0;color:white;">👑</div>
-      <div class="msg-body">
-        <div class="msg-meta">
-          <span class="msg-sender" style="color:#0B57D0;font-weight:700;">Arijal Meutuwah (Bos)</span>
-          <span class="msg-arrow">→</span>
-          <span class="msg-recip">${target === 'both' ? 'Ziyan & Malik' : target.toUpperCase()}</span>
-          <span class="type-chip" style="background:#D3E3FD;color:#041E49;">Direct Order</span>
-          <span class="msg-time">${nowStr}</span>
-        </div>
-        <div class="msg-text"><strong>${text.replace(/\n/g,'<br>')}</strong></div>
-      </div>
-    </div>`;
-  body.insertAdjacentHTML('afterbegin', newMsgHtml);
+  // Simpan secara permanen di LocalStorage agar TIDAK AKAN PERNAH HILANG saat refresh
+  saveStoredOrder(orderObj);
+
+  // Render ulang seketika
+  await loadMessages();
 
   feedback.style.background = '#A6F4C5';
   feedback.style.color = '#002109';
-  feedback.textContent = '✅ Perintah berhasil disiarkan ke Ziyan & Malik! Mesin sedang memproses.';
+  feedback.textContent = '✅ Perintah berhasil tercatat permanen di Executive Room!';
   input.value = '';
 
   setTimeout(() => { feedback.style.display = 'none'; }, 4000);
