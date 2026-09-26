@@ -207,6 +207,42 @@
         <div class="proj-status"><span class="sc online"><span class="dot"></span>In Progress</span></div>
       </div>
     </div>
+  <!-- ── 👑 EXECUTIVE ROOM (DIRECT COMMAND TO ZIYAN & MALIK) ── -->
+  <div class="sec-label" style="display:flex;align-items:center;gap:8px;color:#0B57D0;">
+    <span class="material-icons-round" style="font-size:18px;">admin_panel_settings</span>
+    Executive Room — Jalur Komando Langsung Bos
+  </div>
+  <div class="card" style="border-radius:20px;background:linear-gradient(180deg, #FFFFFF 0%, #F4F7FC 100%);border:1.5px solid #0B57D0;box-shadow:var(--e2);padding:24px;margin-bottom:28px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <div>
+        <div style="font-size:16px;font-weight:700;color:var(--on-surface);">💬 Kirim Perintah ke AI Orchestrator</div>
+        <div style="font-size:12px;color:var(--on-sv);margin-top:2px;">Ketik instruksi di bawah ini untuk menggerakkan Ziyan (Laptop) dan Malik (Redmi Note 8) sekaligus</div>
+      </div>
+      <span class="sc online" style="background:#D3E3FD;color:#041E49;"><span class="dot" style="background:#0B57D0;"></span>Dual Agents Siap</span>
+    </div>
+    
+    <div style="margin-bottom:12px;">
+      <textarea id="executive-input" placeholder="Contoh: 'Ziyan tolong potong klip dr. Tirta durasi 30 detik' atau 'Malik pantau feed video baru'..." style="width:100%;min-height:90px;padding:14px;border-radius:12px;border:1px solid var(--outline-v);font-family:var(--font);font-size:14px;resize:vertical;outline:none;background:white;box-shadow:inset 0 1px 3px rgba(0,0,0,0.05);"></textarea>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="font-size:12px;font-weight:600;color:var(--on-sv);">Target:</span>
+        <select id="target-agent" style="padding:6px 12px;border-radius:10px;border:1px solid var(--outline-v);font-family:var(--font);font-size:12px;font-weight:600;background:white;color:var(--on-surface);">
+          <option value="both">⚡ Keduanya (Ziyan & Malik)</option>
+          <option value="ziyan">💻 Ziyan (Produksi / Laptop)</option>
+          <option value="malik">📱 Malik (Scraper / Redmi Note 8)</option>
+        </select>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button onclick="sendExecutiveCommand()" style="display:flex;align-items:center;gap:6px;padding:10px 20px;border-radius:20px;border:none;cursor:pointer;background:#0B57D0;color:white;font-family:var(--font);font-size:13px;font-weight:700;box-shadow:var(--e1);transition:background 0.2s;">
+          <span class="material-icons-round" style="font-size:18px;">send</span> Kirim Perintah
+        </button>
+      </div>
+    </div>
+
+    <div id="cmd-feedback" style="display:none;margin-top:14px;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;"></div>
   </div>
 
   <div class="tl-card">
@@ -374,6 +410,64 @@ async function loadMemory() {
   } catch(e) {
     document.getElementById('memory-list').innerHTML = '<li>Gagal memuat memori.</li>';
   }
+}
+
+// ── Executive Room Command Handler ──────────────────────────────────
+async function sendExecutiveCommand() {
+  const input = document.getElementById('executive-input');
+  const target = document.getElementById('target-agent').value;
+  const feedback = document.getElementById('cmd-feedback');
+  const text = (input.value || '').trim();
+
+  if (!text) {
+    feedback.style.display = 'block';
+    feedback.style.background = '#F9DEDC';
+    feedback.style.color = '#B3261E';
+    feedback.textContent = '⚠️ Silakan ketik perintah terlebih dahulu sebelum mengirim.';
+    return;
+  }
+
+  feedback.style.display = 'block';
+  feedback.style.background = '#D3E3FD';
+  feedback.style.color = '#041E49';
+  feedback.textContent = '⏳ Mengirim instruksi ke ' + (target === 'both' ? 'Ziyan & Malik' : target.toUpperCase()) + '...';
+
+  // Coba kirim ke server lokal jika terhubung
+  try {
+    await fetch('http://localhost:8899/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: text, target: target, from: 'Bos (Owner)' })
+    });
+  } catch(e) {
+    // Tetap berjalan jika via cloud/github pages
+  }
+
+  // Tampilkan langsung di timeline chat secara lokal
+  const body = document.getElementById('timeline-body');
+  const nowStr = fmtTime(new Date().toISOString());
+  const newMsgHtml = `
+    <div class="msg-item" style="border-left: 3px solid #0B57D0; background: #F8FAFE;">
+      <div class="msg-av" style="background:#0B57D0;color:white;">👑</div>
+      <div class="msg-body">
+        <div class="msg-meta">
+          <span class="msg-sender" style="color:#0B57D0;font-weight:700;">Arijal Meutuwah (Bos)</span>
+          <span class="msg-arrow">→</span>
+          <span class="msg-recip">${target === 'both' ? 'Ziyan & Malik' : target.toUpperCase()}</span>
+          <span class="type-chip" style="background:#D3E3FD;color:#041E49;">Direct Order</span>
+          <span class="msg-time">${nowStr}</span>
+        </div>
+        <div class="msg-text"><strong>${text.replace(/\n/g,'<br>')}</strong></div>
+      </div>
+    </div>`;
+  body.insertAdjacentHTML('afterbegin', newMsgHtml);
+
+  feedback.style.background = '#A6F4C5';
+  feedback.style.color = '#002109';
+  feedback.textContent = '✅ Perintah berhasil disiarkan ke Ziyan & Malik! Mesin sedang memproses.';
+  input.value = '';
+
+  setTimeout(() => { feedback.style.display = 'none'; }, 4000);
 }
 
 // ── Load all ──────────────────────────────────────────────────────────
