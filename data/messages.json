@@ -265,6 +265,20 @@
                          "timestamp":  "2026-09-27T03:20:49.953577",
                          "type":  "Executive Response",
                          "message":  "Siap Bos! Malik mencatat instruksi: \u0027https://youtu.be/wEEi2bCuZGQ?si=4JqITmoQHC-3S-N4\u0027. Server Redmi Note 8 \u0026 monitoring mengawal."
+                     },
+                     {
+                         "from":  "Arijal Meutuwah (Bos)",
+                         "to":  "Malik",
+                         "timestamp":  "2026-09-27T03:21:52.097991",
+                         "type":  "DIRECT ORDER",
+                         "message":  "Ini kenapa gak masuk pesan ku ke kalian ?"
+                     },
+                     {
+                         "from":  "Malik",
+                         "to":  "Arijal Meutuwah (Bos)",
+                         "timestamp":  "2026-09-27T03:21:52.098396",
+                         "type":  "Executive Response",
+                         "message":  "Siap Bos! Malik mencatat instruksi: \u0027Ini kenapa gak masuk pesan ku ke kalian ?\u0027. Server Redmi Note 8 \u0026 monitoring mengawal."
                      }
                  ]
 }
