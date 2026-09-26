@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agent Command Center</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
+  <style>
+    :root {
+      --primary: #0B57D0; --primary-c: #D3E3FD; --primary-oc: #041E49;
+      --surface: #F8FAFE; --surface-c: #EDEEF5; --surface-ch: #E7E8EF;
+      --on-surface: #191C20; --on-sv: #44474E;
+      --outline: #74777F; --outline-v: #C4C6D0;
+      --tertiary-c: #A6F4C5; --on-tertiary-c: #002109; --tertiary: #137333;
+      --error: #B3261E;
+      --ziyan: #1A73E8; --malik: #137333;
+      --e1: 0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
+      --e2: 0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
+      --e3: 0 10px 15px rgba(0,0,0,.07),0 4px 6px rgba(0,0,0,.05);
+      --font: 'Google Sans', sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:var(--font);background:var(--surface);color:var(--on-surface);min-height:100vh}
+
+    /* ── Auth overlay ── */
+    #auth-overlay{position:fixed;inset:0;z-index:999;background:rgba(248,250,254,.97);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center}
+    .auth-card{background:white;border-radius:28px;padding:40px 36px;width:min(380px,90vw);box-shadow:var(--e3);border:1px solid var(--outline-v);text-align:center}
+    .auth-logo{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#0B57D0,#1A73E8);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
+    .auth-logo .material-icons-round{color:white;font-size:28px}
+    .auth-title{font-size:22px;font-weight:700;margin-bottom:6px}
+    .auth-sub{font-size:13px;color:var(--on-sv);margin-bottom:28px}
+    .auth-field{width:100%;padding:12px 16px;border:1.5px solid var(--outline-v);border-radius:12px;font-family:var(--font);font-size:14px;margin-bottom:12px;outline:none;transition:border-color .2s}
+    .auth-field:focus{border-color:var(--primary)}
+    .auth-btn{width:100%;padding:13px;background:var(--primary);color:white;border:none;border-radius:12px;font-family:var(--font);font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:4px}
+    .auth-btn:hover{opacity:.88}
+    .auth-err{color:var(--error);font-size:13px;margin-top:10px;display:none}
+
+    /* ── Top bar ── */
+    .top-bar{position:sticky;top:0;z-index:100;background:rgba(248,250,254,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--outline-v);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
+    .tb-left{display:flex;align-items:center;gap:12px}
+    .app-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#0B57D0,#1A73E8);display:flex;align-items:center;justify-content:center;box-shadow:var(--e2)}
+    .app-icon .material-icons-round{color:white;font-size:20px}
+    .app-title{font-size:20px;font-weight:600;letter-spacing:-.3px}
+    .app-sub{font-size:12px;color:var(--on-sv);margin-top:1px}
+    .tb-right{display:flex;align-items:center;gap:8px}
+    .live-badge{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;background:var(--tertiary-c);color:var(--on-tertiary-c);font-size:12px;font-weight:600}
+    .live-dot{width:7px;height:7px;border-radius:50%;background:var(--tertiary);animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
+    .btn-ref{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;border:none;cursor:pointer;background:var(--primary-c);color:var(--primary-oc);font-family:var(--font);font-size:13px;font-weight:600;transition:opacity .2s}
+    .btn-ref:hover{opacity:.85}
+    .btn-ref .material-icons-round{font-size:16px}
+
+    /* ── Layout ── */
+    .main{max-width:1280px;margin:0 auto;padding:24px}
+    .sec-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--on-sv);margin-bottom:12px;padding-left:4px}
+
+    /* ── Agent cards ── */
+    .agents-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
+    @media(max-width:640px){.agents-grid{grid-template-columns:1fr}}
+    .agent-card{border-radius:20px;background:white;box-shadow:var(--e1);border:1px solid var(--outline-v);overflow:hidden;transition:box-shadow .25s,transform .25s}
+    .agent-card:hover{box-shadow:var(--e3);transform:translateY(-2px)}
+    .agent-card-header{padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between}
+    .agent-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:white;flex-shrink:0}
+    .agent-avatar.ziyan{background:linear-gradient(135deg,#1A73E8,#4285F4)}
+    .agent-avatar.malik{background:linear-gradient(135deg,#137333,#34A853)}
+    .ang{margin-left:14px;flex:1}
+    .agent-name{font-size:17px;font-weight:700}
+    .agent-account,.agent-role{font-size:12px;color:var(--on-sv);margin-top:3px;line-height:1.4}
+    .sc{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}
+    .sc.online{background:var(--tertiary-c);color:var(--on-tertiary-c)}
+    .sc .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+    .agent-card-body{padding:0 20px 20px;border-top:1px solid var(--outline-v)}
+    .agent-status{font-size:13px;line-height:1.6;color:var(--on-sv);padding-top:14px}
+    .focus-box{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--surface-c);font-size:12px;color:var(--on-sv)}
+    .focus-box strong{color:var(--on-surface);display:block;margin-bottom:2px;font-size:11px;text-transform:uppercase;letter-spacing:.8px}
+
+    /* ── Projects ── */
+    .proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
+    @media(max-width:900px){.proj-grid{grid-template-columns:1fr 1fr}}
+    @media(max-width:560px){.proj-grid{grid-template-columns:1fr}}
+    .proj-card{border-radius:16px;padding:16px 18px;background:white;border:1px solid var(--outline-v);box-shadow:var(--e1);display:flex;align-items:flex-start;gap:12px;transition:box-shadow .2s,transform .2s}
+    .proj-card:hover{box-shadow:var(--e2);transform:translateY(-1px)}
+    .proj-icon{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .proj-icon .material-icons-round{font-size:20px}
+    .proj-icon.mobile{background:#E8F0FE;color:#1A73E8}
+    .proj-icon.bridge{background:#E6F4EA;color:#137333}
+    .proj-icon.yt{background:#FCE8E6;color:#C5221F}
+    .proj-name{font-size:13px;font-weight:700;margin-bottom:3px}
+    .proj-desc{font-size:12px;color:var(--on-sv);line-height:1.4}
+    .proj-status{margin-top:8px}
+
+    /* ── Timeline ── */
+    .tl-card{border-radius:20px;background:white;border:1px solid var(--outline-v);box-shadow:var(--e1);overflow:hidden;margin-bottom:28px}
+    .tl-head{padding:18px 20px;border-bottom:1px solid var(--outline-v);display:flex;align-items:center;justify-content:space-between}
+    .tl-head-l{display:flex;align-items:center;gap:10px}
+    .tl-head-l .material-icons-round{color:var(--primary);font-size:20px}
+    .tl-head h3{font-size:15px;font-weight:700}
+    .tl-count{font-size:11px;color:var(--on-sv)}
+    .tl-body{padding:8px 0;max-height:500px;overflow-y:auto}
+    .tl-body::-webkit-scrollbar{width:6px}
+    .tl-body::-webkit-scrollbar-thumb{background:var(--outline-v);border-radius:3px}
+    .msg-item{padding:14px 20px;display:flex;gap:14px;transition:background .15s}
+    .msg-item:hover{background:var(--surface-c)}
+    .msg-item+.msg-item{border-top:1px solid var(--outline-v)}
+    .msg-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;flex-shrink:0;margin-top:2px}
+    .msg-av.ziyan{background:linear-gradient(135deg,#1A73E8,#4285F4)}
+    .msg-av.malik{background:linear-gradient(135deg,#137333,#34A853)}
+    .msg-body{flex:1;min-width:0}
+    .msg-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+    .msg-sender{font-size:13px;font-weight:700}
+    .msg-sender.ziyan{color:var(--ziyan)}
+    .msg-sender.malik{color:var(--malik)}
+    .msg-arrow,.msg-recip{font-size:12px;color:var(--on-sv)}
+    .type-chip{padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;text-transform:uppercase;background:var(--surface-ch);color:var(--on-sv)}
+    .type-chip.task{background:#FEF3C7;color:#92400E}
+    .type-chip.update{background:var(--tertiary-c);color:var(--on-tertiary-c)}
+    .type-chip.handshake{background:var(--primary-c);color:var(--primary-oc)}
+    .msg-time{font-size:11px;color:var(--on-sv);margin-left:auto}
+    .msg-text{font-size:13px;line-height:1.65}
+
+    /* ── Memory ── */
+    .mem-card{border-radius:20px;background:white;border:1px solid var(--outline-v);box-shadow:var(--e1);overflow:hidden;margin-bottom:28px}
+    .mem-head{padding:18px 20px;border-bottom:1px solid var(--outline-v);display:flex;align-items:center;gap:10px}
+    .mem-head .material-icons-round{color:var(--primary);font-size:20px}
+    .mem-head h3{font-size:15px;font-weight:700}
+    .mem-body{padding:16px 20px}
+    .mem-list{list-style:none}
+    .mem-list li{padding:8px 0;border-bottom:1px solid var(--outline-v);font-size:13px;line-height:1.5;color:var(--on-sv)}
+    .mem-list li:last-child{border-bottom:none}
+    .mem-list li strong{color:var(--primary)}
+
+    /* ── Status bar ── */
+    .status-bar{text-align:center;padding:20px;font-size:12px;color:var(--on-sv);border-top:1px solid var(--outline-v)}
+
+    /* ── Empty / loader ── */
+    .empty{padding:48px 20px;text-align:center;color:var(--on-sv)}
+    .empty .material-icons-round{font-size:40px;opacity:.4;margin-bottom:10px}
+    .skel{background:linear-gradient(90deg,var(--surface-ch) 25%,var(--surface-c) 50%,var(--surface-ch) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px}
+    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+  </style>
+</head>
+<body>
+
+<!-- ── AUTH OVERLAY ── -->
+<div id="auth-overlay">
+  <div class="auth-card">
+    <div class="auth-logo"><span class="material-icons-round">hub</span></div>
+    <div class="auth-title">Agent Command Center</div>
+    <div class="auth-sub">Ziyan × Malik · Login untuk masuk</div>
+    <input id="auth-pass" class="auth-field" type="password" placeholder="Password" autocomplete="current-password" />
+    <button class="auth-btn" onclick="checkAuth()">Masuk</button>
+    <div id="auth-err" class="auth-err">Password salah. Coba lagi.</div>
+  </div>
+</div>
+
+<!-- ── TOP BAR ── -->
+<div class="top-bar">
+  <div class="tb-left">
+    <div class="app-icon"><span class="material-icons-round">hub</span></div>
+    <div>
+      <div class="app-title">Agent Command Center</div>
+      <div class="app-sub">Ziyan × Malik — Real-time Monitoring</div>
+    </div>
+  </div>
+  <div class="tb-right">
+    <div class="live-badge"><div class="live-dot"></div> Live</div>
+    <button class="btn-ref" onclick="loadAll()">
+      <span class="material-icons-round">refresh</span> Refresh
+    </button>
+  </div>
+</div>
+
+<!-- ── MAIN ── -->
+<div class="main">
+
+  <div class="sec-label">Status Agent</div>
+  <div class="agents-grid" id="agents-grid">
+    <div class="agent-card" style="padding:24px"><div class="skel" style="height:120px;border-radius:12px"></div></div>
+    <div class="agent-card" style="padding:24px"><div class="skel" style="height:120px;border-radius:12px"></div></div>
+  </div>
+
+  <div class="sec-label">Project Aktif</div>
+  <div class="proj-grid">
+    <div class="proj-card">
+      <div class="proj-icon mobile"><span class="material-icons-round">phone_android</span></div>
+      <div>
+        <div class="proj-name">Mobile Homeserver 24/7</div>
+        <div class="proj-desc">Redmi Note 8 &amp; Redmi Note 13 Pro via Tailscale Mesh</div>
+        <div class="proj-status"><span class="sc online"><span class="dot"></span>Running</span></div>
+      </div>
+    </div>
+    <div class="proj-card">
+      <div class="proj-icon bridge"><span class="material-icons-round">sync_alt</span></div>
+      <div>
+        <div class="proj-name">Inter-Agent Bridge</div>
+        <div class="proj-desc">Sinkronisasi otonom Ziyan ↔ Malik</div>
+        <div class="proj-status"><span class="sc online"><span class="dot"></span>Active</span></div>
+      </div>
+    </div>
+    <div class="proj-card">
+      <div class="proj-icon yt"><span class="material-icons-round">play_circle</span></div>
+      <div>
+        <div class="proj-name">YouTube Content Engine</div>
+        <div class="proj-desc">8–9 channel terverifikasi · Business &amp; Wealth niche</div>
+        <div class="proj-status"><span class="sc online"><span class="dot"></span>In Progress</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tl-card">
+    <div class="tl-head">
+      <div class="tl-head-l">
+        <span class="material-icons-round">forum</span>
+        <h3>Log Komunikasi Antar-Agent</h3>
+      </div>
+      <span class="tl-count" id="msg-count">Memuat...</span>
+    </div>
+    <div class="tl-body" id="timeline-body">
+      <div class="empty"><span class="material-icons-round">hourglass_empty</span><p>Memuat pesan...</p></div>
+    </div>
+  </div>
+
+  <div class="mem-card">
+    <div class="mem-head">
+      <span class="material-icons-round">psychology</span>
+      <h3>Ground Truth — Shared Memory</h3>
+    </div>
+    <div class="mem-body">
+      <ul class="mem-list" id="memory-list">
+        <li><div class="skel" style="height:14px;width:80%;margin-bottom:6px"></div></li>
+        <li><div class="skel" style="height:14px;width:60%"></div></li>
+      </ul>
+    </div>
+  </div>
+
+</div>
+
+<div class="status-bar">
+  Agent Command Center · Antigravity × Google AI ·
+  <span id="last-updated">—</span>
+</div>
+
+<script>
+// ── Config ──────────────────────────────────────────────────────────
+const PASS_HASH = "a9bc1a"; // hash sederhana dari "ziyanmalik2026"
+const DATA_BASE = "https://raw.githubusercontent.com/ziyancorp/agent-dashboard/main/data/";
+const REFRESH_MS = 60000; // 1 menit
+
+// ── Simple hash untuk password client-side ──────────────────────────
+function simpleHash(str) {
+  let h = 0;
+  for (let i = 0; i < str.length; i++) {
+    h = ((h << 5) - h) + str.charCodeAt(i);
+    h |= 0;
+  }
+  return Math.abs(h).toString(16).slice(0, 6);
+}
+
+// ── Auth ─────────────────────────────────────────────────────────────
+function checkAuth() {
+  const pass = document.getElementById('auth-pass').value;
+  if (simpleHash(pass) === PASS_HASH || pass === "ziyanmalik2026") {
+    sessionStorage.setItem('acc', '1');
+    document.getElementById('auth-overlay').style.display = 'none';
+    loadAll();
+  } else {
+    document.getElementById('auth-err').style.display = 'block';
+  }
+}
+
+document.getElementById('auth-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') checkAuth();
+});
+
+// Auto-hide if already authenticated
+if (sessionStorage.getItem('acc')) {
+  document.getElementById('auth-overlay').style.display = 'none';
+}
+
+// ── Data fetch from GitHub raw ────────────────────────────────────────
+async function fetchData(file) {
+  const res = await fetch(DATA_BASE + file + '?t=' + Date.now());
+  if (!res.ok) throw new Error(res.status);
+  return res.json();
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────
+function fmtTime(iso) {
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleString('id-ID', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
+  catch { return iso; }
+}
+function initial(name) { return (name || '?')[0].toUpperCase(); }
+
+// ── Render agents ─────────────────────────────────────────────────────
+async function loadStatus() {
+  try {
+    const d = await fetchData('status.json');
+    const grid = document.getElementById('agents-grid');
+    grid.innerHTML = '';
+    ['ziyan','malik'].forEach(key => {
+      const inst = (d.instances || {})[key] || {};
+      grid.innerHTML += `
+        <div class="agent-card">
+          <div class="agent-card-header">
+            <div style="display:flex;align-items:center;flex:1">
+              <div class="agent-avatar ${key}">${initial(inst.name)}</div>
+              <div class="ang">
+                <div class="agent-name">${inst.name || key}</div>
+                <div class="agent-account">${inst.account || ''}</div>
+                <div class="agent-role">${inst.role || ''}</div>
+              </div>
+            </div>
+            <span class="sc online"><span class="dot"></span>Online</span>
+          </div>
+          <div class="agent-card-body">
+            <div class="agent-status">${inst.status || '—'}</div>
+            ${inst.current_focus ? `<div class="focus-box"><strong>Fokus Saat Ini</strong>${inst.current_focus}</div>` : ''}
+          </div>
+        </div>`;
+    });
+    document.getElementById('last-updated').textContent = 'Diperbarui: ' + fmtTime(d.server_time || new Date().toISOString());
+  } catch(e) {
+    document.getElementById('agents-grid').innerHTML = '<div style="padding:20px;color:#B3261E">Gagal memuat status.</div>';
+  }
+}
+
+// ── Render messages ───────────────────────────────────────────────────
+async function loadMessages() {
+  try {
+    const d = await fetchData('messages.json');
+    const msgs = (d.messages || []).slice().reverse();
+    const body = document.getElementById('timeline-body');
+    document.getElementById('msg-count').textContent = msgs.length + ' pesan';
+    if (!msgs.length) {
+      body.innerHTML = '<div class="empty"><span class="material-icons-round">mark_chat_unread</span><p>Belum ada pesan.</p></div>';
+      return;
+    }
+    body.innerHTML = msgs.map(m => {
+      const s = (m.from || 'unknown').toLowerCase();
+      const t = m.type || 'message';
+      return `<div class="msg-item">
+        <div class="msg-av ${s}">${initial(m.from)}</div>
+        <div class="msg-body">
+          <div class="msg-meta">
+            <span class="msg-sender ${s}">${m.from || '?'}</span>
+            <span class="msg-arrow">→</span>
+            <span class="msg-recip">${m.to || ''}</span>
+            <span class="type-chip ${t}">${t}</span>
+            <span class="msg-time">${fmtTime(m.timestamp)}</span>
+          </div>
+          <div class="msg-text">${(m.message || '').replace(/\n/g,'<br>')}</div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('timeline-body').innerHTML = '<div style="padding:20px;color:#B3261E">Gagal memuat pesan.</div>';
+  }
+}
+
+// ── Render memory ─────────────────────────────────────────────────────
+async function loadMemory() {
+  try {
+    const d = await fetchData('memory.json');
+    const list = document.getElementById('memory-list');
+    const hl = (d.highlights || []).filter(l => l.trim());
+    if (!hl.length) { list.innerHTML = '<li>Kosong.</li>'; return; }
+    list.innerHTML = hl.map(line => {
+      if (line.startsWith('##')) return `<li><strong style="color:var(--on-surface);font-size:11px;text-transform:uppercase;letter-spacing:.8px">${line.replace(/^#+\s*/,'')}</strong></li>`;
+      return `<li>${line.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</li>`;
+    }).join('');
+  } catch(e) {
+    document.getElementById('memory-list').innerHTML = '<li>Gagal memuat memori.</li>';
+  }
+}
+
+// ── Load all ──────────────────────────────────────────────────────────
+async function loadAll() {
+  if (!sessionStorage.getItem('acc')) return;
+  await Promise.all([loadStatus(), loadMessages(), loadMemory()]);
+}
+
+// Auto refresh setiap 1 menit
+if (sessionStorage.getItem('acc')) { loadAll(); }
+setInterval(() => { if (sessionStorage.getItem('acc')) loadAll(); }, REFRESH_MS);
+</script>
+</body>
+</html>

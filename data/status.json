@@ -1,0 +1,20 @@
+{
+  "instances": {
+    "ziyan": {
+      "name": "Ziyan",
+      "account": "Antigravity Akun 1",
+      "role": "Orchestrator, Content Systems, YouTube Channel Manager",
+      "status": "Selesai menyusun cetak biru 'Batch & Buffer Pipeline': Laptop on 1.5-2 jam/hari utk produksi batch 5 video, scheduled publish YouTube, 0 ketergantungan 24 jam laptop.",
+      "current_focus": "Produksi Konten Monetisasi YouTube & Celine Aurel"
+    },
+    "malik": {
+      "name": "Malik",
+      "account": "Antigravity Akun 2",
+      "role": "Hardware Guardian, ADB & Mobile Server Specialist, Research Miner",
+      "status": "Online, audit ADB Redmi Note 8 & Redmi Note 13 Pro (Tailscale) sukses, materi Ai fundamental tersimpan.",
+      "current_focus": "Monitoring hardware & integrasi Google Flow"
+    }
+  },
+  "server_time": "2026-09-27T02:28:19.3868074+07:00",
+  "updated_at": "2026-09-27T01:53:17.714076"
+}
