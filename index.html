@@ -220,9 +220,25 @@
       </div>
       <span class="sc online" style="background:#D3E3FD;color:#041E49;"><span class="dot" style="background:#0B57D0;"></span>Dual Agents Siap</span>
     </div>
+
+    <!-- Quick Action Chips -->
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+      <button onclick="applyQuickAction('Tolong cek suhu baterai, RAM, dan status homeserver Redmi Note 8 sekarang.', 'malik')" style="padding:6px 12px;border-radius:16px;border:1px solid #D3E3FD;background:#EDF2FA;color:#0B57D0;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:4px;">
+        <span class="material-icons-round" style="font-size:14px;">thermostat</span> Cek Suhu & RAM Server
+      </button>
+      <button onclick="applyQuickAction('Cek berapa video baru yang sudah masuk antrean di Termux Redmi Note 8.', 'malik')" style="padding:6px 12px;border-radius:16px;border:1px solid #D3E3FD;background:#EDF2FA;color:#0B57D0;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:4px;">
+        <span class="material-icons-round" style="font-size:14px;">queue</span> Cek Antrean Video Termux
+      </button>
+      <button onclick="applyQuickAction('Ziyan tolong render 1 batch video klip (Bold Pop Subtitle) untuk channel prioritas.', 'ziyan')" style="padding:6px 12px;border-radius:16px;border:1px solid #D3E3FD;background:#EDF2FA;color:#0B57D0;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:4px;">
+        <span class="material-icons-round" style="font-size:14px;">movie</span> Mulai Render 1 Batch
+      </button>
+      <button onclick="applyQuickAction('Kalian berdua laporkan status kesiapan sistem dan progress monetisasi terbaru.', 'both')" style="padding:6px 12px;border-radius:16px;border:1px solid #D3E3FD;background:#EDF2FA;color:#0B57D0;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:4px;">
+        <span class="material-icons-round" style="font-size:14px;">insights</span> Laporan Kesiapan Sistem
+      </button>
+    </div>
     
     <div style="margin-bottom:12px;">
-      <textarea id="executive-input" placeholder="Contoh: 'Ziyan tolong potong klip dr. Tirta durasi 30 detik' atau 'Malik pantau feed video baru'..." style="width:100%;min-height:90px;padding:14px;border-radius:12px;border:1px solid var(--outline-v);font-family:var(--font);font-size:14px;resize:vertical;outline:none;background:white;box-shadow:inset 0 1px 3px rgba(0,0,0,0.05);"></textarea>
+      <textarea id="executive-input" placeholder="Ketik instruksi untuk Ziyan & Malik..." style="width:100%;min-height:90px;padding:14px;border-radius:12px;border:1px solid var(--outline-v);font-family:var(--font);font-size:14px;resize:vertical;outline:none;background:white;box-shadow:inset 0 1px 3px rgba(0,0,0,0.05);"></textarea>
     </div>
 
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
@@ -236,7 +252,7 @@
       </div>
 
       <div style="display:flex;align-items:center;gap:8px;">
-        <button onclick="sendExecutiveCommand()" style="display:flex;align-items:center;gap:6px;padding:10px 20px;border-radius:20px;border:none;cursor:pointer;background:#0B57D0;color:white;font-family:var(--font);font-size:13px;font-weight:700;box-shadow:var(--e1);transition:background 0.2s;">
+        <button id="btn-send-cmd" onclick="sendExecutiveCommand()" style="display:flex;align-items:center;gap:6px;padding:10px 20px;border-radius:20px;border:none;cursor:pointer;background:#0B57D0;color:white;font-family:var(--font);font-size:13px;font-weight:700;box-shadow:var(--e1);transition:background 0.2s;">
           <span class="material-icons-round" style="font-size:18px;">send</span> Kirim Perintah
         </button>
       </div>
@@ -434,10 +450,19 @@ async function loadMemory() {
 }
 
 // ── Executive Room Command Handler ──────────────────────────────────
+let cachedPublicUrl = "https://females-realize-mileage-estimate.trycloudflare.com";
+
+function applyQuickAction(cmdText, target) {
+  document.getElementById('executive-input').value = cmdText;
+  if (target) document.getElementById('target-agent').value = target;
+  document.getElementById('executive-input').focus();
+}
+
 async function sendExecutiveCommand() {
   const input = document.getElementById('executive-input');
   const target = document.getElementById('target-agent').value;
   const feedback = document.getElementById('cmd-feedback');
+  const btn = document.getElementById('btn-send-cmd');
   const text = (input.value || '').trim();
 
   if (!text) {
@@ -451,28 +476,65 @@ async function sendExecutiveCommand() {
   feedback.style.display = 'block';
   feedback.style.background = '#D3E3FD';
   feedback.style.color = '#041E49';
-  feedback.textContent = '⏳ Menyimpan dan menyiarkan instruksi Bos...';
+  feedback.innerHTML = '<span class="material-icons-round" style="font-size:16px;vertical-align:middle;animation:spin 1s linear infinite;">sync</span> <strong>Menghubungkan ke Core Ziyan & Malik...</strong>';
+  btn.disabled = true;
 
-  const orderObj = {
-    from: 'Arijal Meutuwah (Bos)',
-    to: target === 'both' ? 'Ziyan & Malik' : target.toUpperCase(),
-    type: 'Direct Order',
-    message: text,
-    timestamp: new Date().toISOString()
-  };
+  // Determine endpoint
+  let apiBase = '';
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.includes('trycloudflare.com')) {
+    apiBase = '';
+  } else {
+    apiBase = cachedPublicUrl;
+  }
 
-  // Simpan secara permanen di LocalStorage agar TIDAK AKAN PERNAH HILANG saat refresh
-  saveStoredOrder(orderObj);
+  const authHeader = 'Basic ' + btoa('bos:ziyanmalik2026');
 
-  // Render ulang seketika
-  await loadMessages();
+  try {
+    const res = await fetch(apiBase + '/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': authHeader
+      },
+      body: JSON.stringify({
+        message: text,
+        target: target
+      })
+    });
 
-  feedback.style.background = '#A6F4C5';
-  feedback.style.color = '#002109';
-  feedback.textContent = '✅ Perintah berhasil tercatat permanen di Executive Room!';
-  input.value = '';
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const data = await res.json();
 
-  setTimeout(() => { feedback.style.display = 'none'; }, 4000);
+    feedback.style.background = '#A6F4C5';
+    feedback.style.color = '#002109';
+    feedback.innerHTML = '✅ <strong>Perintah DITERIMA!</strong> ' + (data.detail || 'Instruksi tersampaikan ke agen.') + ' Respons langsung tampil di timeline.';
+    input.value = '';
+
+    // Immediately reload messages
+    setTimeout(loadMessages, 800);
+    setTimeout(() => { feedback.style.display = 'none'; }, 6000);
+
+  } catch(err) {
+    console.warn('API error, saving local order backup:', err);
+    // Fallback: save to LocalStorage so order is never lost
+    const orderObj = {
+      from: 'Arijal Meutuwah (Bos)',
+      to: target === 'both' ? 'Ziyan & Malik' : target.toUpperCase(),
+      type: 'Direct Order',
+      message: text,
+      timestamp: new Date().toISOString()
+    };
+    saveStoredOrder(orderObj);
+    await loadMessages();
+
+    feedback.style.background = '#FEF3C7';
+    feedback.style.color = '#92400E';
+    feedback.innerHTML = '⚠️ Perintah tercatat di room. Pastikan server laptop/tunnel aktif jika ingin eksekusi live.';
+    input.value = '';
+    setTimeout(() => { feedback.style.display = 'none'; }, 6000);
+  } finally {
+    btn.disabled = false;
+  }
 }
 
 // ── Load all ──────────────────────────────────────────────────────────
