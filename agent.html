@@ -2,553 +2,742 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <meta http-equiv="Pragma" content="no-cache" />
   <meta http-equiv="Expires" content="0" />
-  <title>Agent Command Center v2.5</title>
+  <title>👑 Ziyan Corp Executive Room</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@400;500;600;700&family=Google+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet" />
   <style>
     :root {
-      --primary: #0B57D0; --primary-c: #D3E3FD; --primary-oc: #041E49;
-      --surface: #F8FAFE; --surface-c: #EDEEF5; --surface-ch: #E7E8EF;
-      --on-surface: #191C20; --on-sv: #44474E;
-      --outline: #74777F; --outline-v: #C4C6D0;
-      --tertiary-c: #A6F4C5; --on-tertiary-c: #002109; --tertiary: #137333;
-      --error: #B3261E;
-      --ziyan: #1A73E8; --malik: #137333;
-      --e1: 0 1px 3px rgba(0,0,0,.1),0 1px 2px rgba(0,0,0,.06);
-      --e2: 0 4px 6px rgba(0,0,0,.07),0 2px 4px rgba(0,0,0,.06);
-      --e3: 0 10px 15px rgba(0,0,0,.07),0 4px 6px rgba(0,0,0,.05);
-      --font: 'Google Sans', sans-serif;
+      --wa-teal: #008069;
+      --wa-teal-dark: #075E54;
+      --wa-light-green: #D9FDD3;
+      --wa-bg: #EFEAE2;
+      --wa-chat-bg: #EFEAE2;
+      --wa-bubble-in: #FFFFFF;
+      --wa-bubble-out: #D9FDD3;
+      --wa-gray-text: #667781;
+      --wa-blue-check: #53BDEB;
+      --ziyan-color: #0284C7;
+      --malik-color: #15803D;
+      --bos-color: #075E54;
+      --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:var(--font);background:var(--surface);color:var(--on-surface);min-height:100vh}
 
-    /* ── Auth overlay ── */
-    #auth-overlay{position:fixed;inset:0;z-index:999;background:rgba(248,250,254,.97);backdrop-filter:blur(20px);display:flex;align-items:center;justify-content:center}
-    .auth-card{background:white;border-radius:28px;padding:40px 36px;width:min(380px,90vw);box-shadow:var(--e3);border:1px solid var(--outline-v);text-align:center}
-    .auth-logo{width:56px;height:56px;border-radius:16px;background:linear-gradient(135deg,#0B57D0,#1A73E8);display:flex;align-items:center;justify-content:center;margin:0 auto 20px}
-    .auth-logo .material-icons-round{color:white;font-size:28px}
-    .auth-title{font-size:22px;font-weight:700;margin-bottom:6px}
-    .auth-sub{font-size:13px;color:var(--on-sv);margin-bottom:28px}
-    .auth-field{width:100%;padding:12px 16px;border:1.5px solid var(--outline-v);border-radius:12px;font-family:var(--font);font-size:14px;margin-bottom:12px;outline:none;transition:border-color .2s}
-    .auth-field:focus{border-color:var(--primary)}
-    .auth-btn{width:100%;padding:13px;background:var(--primary);color:white;border:none;border-radius:12px;font-family:var(--font);font-size:15px;font-weight:600;cursor:pointer;transition:opacity .2s;margin-top:4px}
-    .auth-btn:hover{opacity:.88}
-    .auth-err{color:var(--error);font-size:13px;margin-top:10px;display:none}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    /* ── Top bar ── */
-    .top-bar{position:sticky;top:0;z-index:100;background:rgba(248,250,254,.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--outline-v);padding:0 24px;height:64px;display:flex;align-items:center;justify-content:space-between}
-    .tb-left{display:flex;align-items:center;gap:12px}
-    .app-icon{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#0B57D0,#1A73E8);display:flex;align-items:center;justify-content:center;box-shadow:var(--e2)}
-    .app-icon .material-icons-round{color:white;font-size:20px}
-    .app-title{font-size:20px;font-weight:600;letter-spacing:-.3px}
-    .app-sub{font-size:12px;color:var(--on-sv);margin-top:1px}
-    .tb-right{display:flex;align-items:center;gap:8px}
-    .live-badge{display:flex;align-items:center;gap:6px;padding:6px 12px;border-radius:20px;background:var(--tertiary-c);color:var(--on-tertiary-c);font-size:12px;font-weight:600}
-    .live-dot{width:7px;height:7px;border-radius:50%;background:var(--tertiary);animation:pulse 2s ease-in-out infinite}
-    @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.6;transform:scale(.85)}}
-    .btn-ref{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;border:none;cursor:pointer;background:var(--primary-c);color:var(--primary-oc);font-family:var(--font);font-size:13px;font-weight:600;transition:opacity .2s}
-    .btn-ref:hover{opacity:.85}
-    .btn-ref .material-icons-round{font-size:16px}
+    body {
+      font-family: var(--font);
+      background: #D1D7DB;
+      color: #111B21;
+      height: 100dvh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
 
-    /* ── Layout ── */
-    .main{max-width:1280px;margin:0 auto;padding:24px}
-    .sec-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--on-sv);margin-bottom:12px;padding-left:4px}
+    /* ── Main App Container ── */
+    #app-container {
+      width: 100%;
+      max-width: 900px;
+      height: 100%;
+      background: var(--wa-bg);
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+      position: relative;
+    }
 
-    /* ── Agent cards ── */
-    .agents-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:28px}
-    @media(max-width:640px){.agents-grid{grid-template-columns:1fr}}
-    .agent-card{border-radius:20px;background:white;box-shadow:var(--e1);border:1px solid var(--outline-v);overflow:hidden;transition:box-shadow .25s,transform .25s}
-    .agent-card:hover{box-shadow:var(--e3);transform:translateY(-2px)}
-    .agent-card-header{padding:20px 20px 16px;display:flex;align-items:flex-start;justify-content:space-between}
-    .agent-avatar{width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:white;flex-shrink:0}
-    .agent-avatar.ziyan{background:linear-gradient(135deg,#1A73E8,#4285F4)}
-    .agent-avatar.malik{background:linear-gradient(135deg,#137333,#34A853)}
-    .ang{margin-left:14px;flex:1}
-    .agent-name{font-size:17px;font-weight:700}
-    .agent-account,.agent-role{font-size:12px;color:var(--on-sv);margin-top:3px;line-height:1.4}
-    .sc{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:12px;font-size:11px;font-weight:600}
-    .sc.online{background:var(--tertiary-c);color:var(--on-tertiary-c)}
-    .sc .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
-    .agent-card-body{padding:0 20px 20px;border-top:1px solid var(--outline-v)}
-    .agent-status{font-size:13px;line-height:1.6;color:var(--on-sv);padding-top:14px}
-    .focus-box{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--surface-c);font-size:12px;color:var(--on-sv)}
-    .focus-box strong{color:var(--on-surface);display:block;margin-bottom:2px;font-size:11px;text-transform:uppercase;letter-spacing:.8px}
+    @media (min-width: 900px) {
+      #app-container {
+        height: 96dvh;
+        border-radius: 16px;
+        overflow: hidden;
+      }
+    }
 
-    /* ── Projects ── */
-    .proj-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px}
-    @media(max-width:900px){.proj-grid{grid-template-columns:1fr 1fr}}
-    @media(max-width:560px){.proj-grid{grid-template-columns:1fr}}
-    .proj-card{border-radius:16px;padding:16px 18px;background:white;border:1px solid var(--outline-v);box-shadow:var(--e1);display:flex;align-items:flex-start;gap:12px;transition:box-shadow .2s,transform .2s}
-    .proj-card:hover{box-shadow:var(--e2);transform:translateY(-1px)}
-    .proj-icon{width:40px;height:40px;border-radius:12px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-    .proj-icon .material-icons-round{font-size:20px}
-    .proj-icon.mobile{background:#E8F0FE;color:#1A73E8}
-    .proj-icon.bridge{background:#E6F4EA;color:#137333}
-    .proj-icon.yt{background:#FCE8E6;color:#C5221F}
-    .proj-name{font-size:13px;font-weight:700;margin-bottom:3px}
-    .proj-desc{font-size:12px;color:var(--on-sv);line-height:1.4}
-    .proj-status{margin-top:8px}
+    /* ── WhatsApp Header ── */
+    .wa-header {
+      background: var(--wa-teal);
+      color: white;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+      flex-shrink: 0;
+      z-index: 20;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
 
-    /* ── Timeline ── */
-    .tl-card{border-radius:20px;background:white;border:1px solid var(--outline-v);box-shadow:var(--e1);overflow:hidden;margin-bottom:28px}
-    .tl-head{padding:18px 20px;border-bottom:1px solid var(--outline-v);display:flex;align-items:center;justify-content:space-between}
-    .tl-head-l{display:flex;align-items:center;gap:10px}
-    .tl-head-l .material-icons-round{color:var(--primary);font-size:20px}
-    .tl-head h3{font-size:15px;font-weight:700}
-    .tl-count{font-size:11px;color:var(--on-sv)}
-    .tl-body{padding:8px 0;max-height:500px;overflow-y:auto}
-    .tl-body::-webkit-scrollbar{width:6px}
-    .tl-body::-webkit-scrollbar-thumb{background:var(--outline-v);border-radius:3px}
-    .msg-item{padding:14px 20px;display:flex;gap:14px;transition:background .15s}
-    .msg-item:hover{background:var(--surface-c)}
-    .msg-item+.msg-item{border-top:1px solid var(--outline-v)}
-    .msg-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:white;flex-shrink:0;margin-top:2px}
-    .msg-av.ziyan{background:linear-gradient(135deg,#1A73E8,#4285F4)}
-    .msg-av.malik{background:linear-gradient(135deg,#137333,#34A853)}
-    .msg-body{flex:1;min-width:0}
-    .msg-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:6px}
-    .msg-sender{font-size:13px;font-weight:700}
-    .msg-sender.ziyan{color:var(--ziyan)}
-    .msg-sender.malik{color:var(--malik)}
-    .msg-arrow,.msg-recip{font-size:12px;color:var(--on-sv)}
-    .type-chip{padding:2px 8px;border-radius:8px;font-size:10px;font-weight:700;text-transform:uppercase;background:var(--surface-ch);color:var(--on-sv)}
-    .type-chip.task{background:#FEF3C7;color:#92400E}
-    .type-chip.update{background:var(--tertiary-c);color:var(--on-tertiary-c)}
-    .type-chip.handshake{background:var(--primary-c);color:var(--primary-oc)}
-    .msg-time{font-size:11px;color:var(--on-sv);margin-left:auto}
-    .msg-text{font-size:13px;line-height:1.65}
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
 
-    /* ── Memory ── */
-    .mem-card{border-radius:20px;background:white;border:1px solid var(--outline-v);box-shadow:var(--e1);overflow:hidden;margin-bottom:28px}
-    .mem-head{padding:18px 20px;border-bottom:1px solid var(--outline-v);display:flex;align-items:center;gap:10px}
-    .mem-head .material-icons-round{color:var(--primary);font-size:20px}
-    .mem-head h3{font-size:15px;font-weight:700}
-    .mem-body{padding:16px 20px}
-    .mem-list{list-style:none}
-    .mem-list li{padding:8px 0;border-bottom:1px solid var(--outline-v);font-size:13px;line-height:1.5;color:var(--on-sv)}
-    .mem-list li:last-child{border-bottom:none}
-    .mem-list li strong{color:var(--primary)}
+    .group-avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: #128C7E;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      border: 1.5px solid rgba(255,255,255,0.4);
+    }
 
-    /* ── Status bar ── */
-    .status-bar{text-align:center;padding:20px;font-size:12px;color:var(--on-sv);border-top:1px solid var(--outline-v)}
+    .group-info h2 {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-    /* ── Empty / loader ── */
-    .empty{padding:48px 20px;text-align:center;color:var(--on-sv)}
-    .empty .material-icons-round{font-size:40px;opacity:.4;margin-bottom:10px}
-    .skel{background:linear-gradient(90deg,var(--surface-ch) 25%,var(--surface-c) 50%,var(--surface-ch) 75%);background-size:200% 100%;animation:shimmer 1.5s infinite;border-radius:8px}
-    @keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+    .group-members {
+      font-size: 12px;
+      color: rgba(255,255,255,0.85);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 230px;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .icon-btn {
+      background: none;
+      border: none;
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 6px;
+      border-radius: 50%;
+      transition: background 0.2s;
+    }
+    .icon-btn:hover { background: rgba(255,255,255,0.15); }
+
+    /* ── Info Banner (Pinned Status) ── */
+    .info-banner {
+      background: #E8F5E9;
+      border-bottom: 1px solid #C8E6C9;
+      padding: 6px 14px;
+      font-size: 12px;
+      color: #2E7D32;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+
+    .live-indicator {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-weight: 600;
+    }
+
+    .green-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #2E7D32;
+      animation: pulse 1.8s infinite;
+    }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    /* ── Chat Messages Stream (Scroll Area) ── */
+    .chat-stream {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 16px;
+      background-color: var(--wa-chat-bg);
+      background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
+      background-size: 20px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .date-divider {
+      align-self: center;
+      background: rgba(255,255,255,0.9);
+      color: #54656F;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+      margin: 6px 0;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* ── Chat Bubble ── */
+    .msg-row {
+      display: flex;
+      flex-direction: column;
+      max-width: 82%;
+      animation: fadeIn 0.15s ease-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+    .msg-row.out {
+      align-self: flex-end;
+    }
+    .msg-row.in {
+      align-self: flex-start;
+    }
+
+    .bubble {
+      padding: 6px 9px 4px 9px;
+      border-radius: 8px;
+      box-shadow: 0 1px 1px rgba(0,0,0,0.13);
+      position: relative;
+      font-size: 14px;
+      line-height: 1.42;
+      word-break: break-word;
+    }
+
+    .msg-row.out .bubble {
+      background: var(--wa-bubble-out);
+      border-top-right-radius: 2px;
+    }
+    .msg-row.in .bubble {
+      background: var(--wa-bubble-in);
+      border-top-left-radius: 2px;
+    }
+
+    .sender-name {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 2px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .sender-name.ziyan { color: var(--ziyan-color); }
+    .sender-name.malik { color: var(--malik-color); }
+    .sender-name.bos { color: var(--bos-color); }
+
+    .sender-badge {
+      font-size: 9px;
+      padding: 1px 5px;
+      border-radius: 4px;
+      font-weight: 600;
+      background: rgba(0,0,0,0.06);
+    }
+
+    .msg-text {
+      color: #111B21;
+    }
+
+    .file-card {
+      margin-top: 4px;
+      margin-bottom: 4px;
+      padding: 8px 10px;
+      background: rgba(0,0,0,0.04);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border: 1px solid rgba(0,0,0,0.08);
+    }
+    .file-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 6px;
+      background: var(--wa-teal);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .msg-meta-footer {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 4px;
+      margin-top: 2px;
+      float: right;
+      margin-left: 12px;
+    }
+
+    .msg-time {
+      font-size: 11px;
+      color: var(--wa-gray-text);
+    }
+
+    .checkmarks {
+      font-size: 14px;
+      color: var(--wa-blue-check);
+    }
+
+    /* ── Quick Chips Bar ── */
+    .quick-chips-bar {
+      padding: 6px 12px;
+      background: #F0F2F5;
+      border-top: 1px solid #E2E8F0;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .quick-chips-bar::-webkit-scrollbar { display: none; }
+
+    .chip-btn {
+      background: white;
+      border: 1px solid #CBD5E1;
+      padding: 5px 12px;
+      border-radius: 16px;
+      font-size: 12px;
+      font-weight: 500;
+      color: #334155;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+      flex-shrink: 0;
+    }
+    .chip-btn:hover { background: #F8FAFC; border-color: var(--wa-teal); }
+
+    /* ── Input Bar ── */
+    .input-bar {
+      background: #F0F2F5;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .target-select {
+      background: white;
+      border: 1px solid #CBD5E1;
+      padding: 7px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #0F172A;
+      outline: none;
+      flex-shrink: 0;
+    }
+
+    .input-pill-wrapper {
+      flex: 1;
+      background: white;
+      border-radius: 24px;
+      padding: 4px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+    }
+
+    .chat-textarea {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: var(--font);
+      font-size: 14px;
+      padding: 6px 0;
+      resize: none;
+      max-height: 90px;
+      background: transparent;
+      color: #111B21;
+    }
+
+    .attach-btn {
+      color: #54656F;
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 4px;
+    }
+    .attach-btn:hover { color: var(--wa-teal); }
+
+    .send-circle-btn {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--wa-teal);
+      color: white;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      flex-shrink: 0;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .send-circle-btn:hover { background: #00735E; }
+    .send-circle-btn:active { transform: scale(0.95); }
+
+    /* ── Attachment Preview Tag ── */
+    #file-selected-tag {
+      position: absolute;
+      top: -38px;
+      left: 14px;
+      right: 14px;
+      background: white;
+      padding: 6px 12px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      font-weight: 600;
+      color: #0F172A;
+      border: 1px solid #CBD5E1;
+      z-index: 10;
+    }
+
+    /* ── Auth Modal (Popup Ringkas) ── */
+    #auth-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(17,27,33,0.85);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .auth-box {
+      background: white;
+      padding: 30px 26px;
+      border-radius: 16px;
+      text-align: center;
+      width: min(340px, 86%);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+    }
+    .auth-box h3 { margin-bottom: 8px; font-size: 18px; color: #111B21; }
+    .auth-box p { font-size: 13px; color: #667781; margin-bottom: 20px; }
+    .auth-box input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #CBD5E1;
+      border-radius: 8px;
+      margin-bottom: 12px;
+      outline: none;
+      font-size: 14px;
+    }
+    .auth-box button {
+      width: 100%;
+      padding: 11px;
+      background: var(--wa-teal);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
-<!-- ── AUTH OVERLAY ── -->
-<div id="auth-overlay">
-  <div class="auth-card">
-    <div class="auth-logo"><span class="material-icons-round">hub</span></div>
-    <div class="auth-title">Agent Command Center</div>
-    <div class="auth-sub">Ziyan × Malik · Login untuk masuk</div>
-    <input id="auth-pass" class="auth-field" type="password" placeholder="Password" autocomplete="current-password" />
-    <button class="auth-btn" onclick="checkAuth()">Masuk</button>
-    <div id="auth-err" class="auth-err">Password salah. Coba lagi.</div>
-  </div>
-</div>
+<div id="app-container">
 
-<!-- ── TOP BAR ── -->
-<div class="top-bar">
-  <div class="tb-left">
-    <div class="app-icon"><span class="material-icons-round">hub</span></div>
-    <div>
-      <div class="app-title" style="display:flex;align-items:center;gap:6px;">
-        Agent Command Center
-        <span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;background:#E6F4EA;color:#137333;border:1px solid #CEEAD6;">v2.5</span>
+  <!-- ── AUTH POPUP (JIKA BELUM LOGIN) ── -->
+  <div id="auth-overlay">
+    <div class="auth-box">
+      <div style="width:50px;height:50px;border-radius:50%;background:#008069;color:white;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+        <span class="material-icons-round" style="font-size:28px;">lock</span>
       </div>
-      <div class="app-sub">Ziyan × Malik — Real-time Monitoring</div>
+      <h3>Executive Room</h3>
+      <p>Masukkan password untuk masuk ke ruang koordinasi Ziyan & Malik</p>
+      <input type="password" id="pass-input" placeholder="Password" autocomplete="current-password" />
+      <button onclick="submitAuth()">Masuk ke Grup</button>
+      <div id="auth-error" style="display:none;color:#B3261E;font-size:12px;margin-top:8px;">Password salah.</div>
     </div>
   </div>
-  <div class="tb-right">
-    <div class="live-badge"><div class="live-dot"></div> Live</div>
-    <button class="btn-ref" onclick="window.location.href = window.location.pathname + '?v=' + Date.now();" style="background:#E8F0FE;color:#0B57D0;" title="Bypass cache browser">
-      <span class="material-icons-round">autorenew</span> Force Update
+
+  <!-- ── HEADER WHATSAPP GRUP ── -->
+  <div class="wa-header">
+    <div class="header-left" onclick="forceUpdate()">
+      <div class="group-avatar">
+        <span class="material-icons-round" style="font-size:24px;">groups</span>
+      </div>
+      <div class="group-info">
+        <h2>👑 Ziyan Corp Exec</h2>
+        <div class="group-members">Bos, Ziyan (Laptop), Malik (Server)</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" onclick="forceUpdate()" title="Paksa Update (Bypass Cache)">
+        <span class="material-icons-round" style="font-size:20px;">autorenew</span>
+      </button>
+      <button class="icon-btn" onclick="loadMessages(true)" title="Segarkan Pesan">
+        <span class="material-icons-round" style="font-size:20px;">refresh</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ── STATUS BANNER ── -->
+  <div class="info-banner">
+    <div class="live-indicator">
+      <div class="green-dot"></div>
+      <span>Ziyan & Malik Online · Standby Mandat</span>
+    </div>
+    <div style="font-size:11px;color:#1B5E20;font-weight:600;" id="last-ping">Live</div>
+  </div>
+
+  <!-- ── CHAT STREAM (ALUR WHATSAPP) ── -->
+  <div class="chat-stream" id="chat-stream">
+    <div class="date-divider">Hari ini</div>
+    <div style="text-align:center;color:#667781;font-size:12px;padding:20px;">Memuat riwayat chat grup...</div>
+  </div>
+
+  <!-- ── ATTACHMENT SELECTED PREVIEW ── -->
+  <div id="file-selected-tag">
+    <div style="display:flex;align-items:center;gap:6px;">
+      <span class="material-icons-round" style="color:#008069;font-size:18px;">description</span>
+      <span id="file-name-show">filename.ext</span>
+    </div>
+    <button onclick="clearSelectedFile()" style="border:none;background:none;color:#B3261E;cursor:pointer;font-weight:700;">Hapus</button>
+  </div>
+
+  <!-- ── QUICK ACTION CHIPS (TOMBOL CEPAT BOS) ── -->
+  <div class="quick-chips-bar">
+    <button class="chip-btn" onclick="sendQuickCommand('Tolong laporkan status suhu, baterai, dan RAM server Redmi Note 8 sekarang.', 'malik')">
+      <span>📱</span> Cek Status Server
     </button>
-    <button class="btn-ref" onclick="loadAll()">
-      <span class="material-icons-round">refresh</span> Refresh
+    <button class="chip-btn" onclick="sendQuickCommand('Cek berapa antrean video baru yang sudah tertangkap di Termux.', 'malik')">
+      <span>📥</span> Cek Antrean Video
+    </button>
+    <button class="chip-btn" onclick="sendQuickCommand('Ziyan tolong render 1 batch video klip Bold Pop untuk channel prioritas.', 'ziyan')">
+      <span>🎬</span> Render 1 Batch Video
+    </button>
+    <button class="chip-btn" onclick="sendQuickCommand('Kalian berdua laporkan kesiapan sistem monetisasi malam ini.', 'both')">
+      <span>📊</span> Laporan Sistem
     </button>
   </div>
-</div>
 
-<!-- ── MAIN ── -->
-<div class="main">
+  <!-- ── INPUT BAR WHATSAPP ── -->
+  <div class="input-bar">
+    <select id="target-agent" class="target-select">
+      <option value="both">⚡ Semua (Ziyan & Malik)</option>
+      <option value="ziyan">💻 Ziyan Saja</option>
+      <option value="malik">📱 Malik Saja</option>
+    </select>
 
-  <div class="sec-label">Status Agent</div>
-  <div class="agents-grid" id="agents-grid">
-    <div class="agent-card" style="padding:24px"><div class="skel" style="height:120px;border-radius:12px"></div></div>
-    <div class="agent-card" style="padding:24px"><div class="skel" style="height:120px;border-radius:12px"></div></div>
+    <div class="input-pill-wrapper">
+      <input type="file" id="file-input" style="display:none;" onchange="onFileChosen(this)" />
+      <button class="attach-btn" onclick="document.getElementById('file-input').click()" title="Kirim File / Foto / Dokumen">
+        <span class="material-icons-round" style="font-size:22px;">attach_file</span>
+      </button>
+      <textarea id="chat-input" class="chat-textarea" rows="1" placeholder="Ketik pesan..." onkeydown="handleEnter(event)"></textarea>
+    </div>
+
+    <button id="send-btn" class="send-circle-btn" onclick="sendMessage()">
+      <span class="material-icons-round" style="font-size:22px;">send</span>
+    </button>
   </div>
 
-  <div class="sec-label">Project Aktif</div>
-  <div class="proj-grid">
-    <div class="proj-card">
-      <div class="proj-icon mobile"><span class="material-icons-round">phone_android</span></div>
-      <div>
-        <div class="proj-name">Mobile Homeserver 24/7</div>
-        <div class="proj-desc">Redmi Note 8 &amp; Redmi Note 13 Pro via Tailscale Mesh</div>
-        <div class="proj-status"><span class="sc online"><span class="dot"></span>Running</span></div>
-      </div>
-    </div>
-    <div class="proj-card">
-      <div class="proj-icon bridge"><span class="material-icons-round">sync_alt</span></div>
-      <div>
-        <div class="proj-name">Inter-Agent Bridge</div>
-        <div class="proj-desc">Sinkronisasi otonom Ziyan ↔ Malik</div>
-        <div class="proj-status"><span class="sc online"><span class="dot"></span>Active</span></div>
-      </div>
-    </div>
-    <div class="proj-card">
-      <div class="proj-icon yt"><span class="material-icons-round">play_circle</span></div>
-      <div>
-        <div class="proj-name">YouTube Content Engine</div>
-        <div class="proj-desc">8–9 channel terverifikasi · Business &amp; Wealth niche</div>
-        <div class="proj-status"><span class="sc online"><span class="dot"></span>In Progress</span></div>
-      </div>
-    </div>
-  <!-- ── 👑 EXECUTIVE ROOM (DIRECT COMMAND TO ZIYAN & MALIK) ── -->
-  <div class="sec-label" style="display:flex;align-items:center;gap:8px;color:#0B57D0;">
-    <span class="material-icons-round" style="font-size:18px;">admin_panel_settings</span>
-    Executive Room — Jalur Komando Langsung Bos
-  </div>
-  <div class="card" style="border-radius:20px;background:linear-gradient(180deg, #FFFFFF 0%, #F4F7FC 100%);border:1.5px solid #0B57D0;box-shadow:var(--e2);padding:24px;margin-bottom:28px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
-      <div>
-        <div style="font-size:16px;font-weight:700;color:var(--on-surface);">💬 Kirim Perintah ke AI Orchestrator</div>
-        <div style="font-size:12px;color:var(--on-sv);margin-top:2px;">Ketik instruksi di bawah ini untuk menggerakkan Ziyan (Laptop) dan Malik (Redmi Note 8) sekaligus</div>
-      </div>
-      <span class="sc online" style="background:#D3E3FD;color:#041E49;"><span class="dot" style="background:#0B57D0;"></span>Dual Agents Siap</span>
-    </div>
-
-    <!-- Quick Action Chips -->
-    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
-      <button onclick="applyQuickAction('Tolong cek suhu baterai, RAM, dan status homeserver Redmi Note 8 sekarang.', 'malik')" style="padding:6px 12px;border-radius:16px;border:1px solid #D3E3FD;background:#EDF2FA;color:#0B57D0;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:4px;">
-        <span class="material-icons-round" style="font-size:14px;">thermostat</span> Cek Suhu & RAM Server
-      </button>
-      <button onclick="applyQuickAction('Cek berapa video baru yang sudah masuk antrean di Termux Redmi Note 8.', 'malik')" style="padding:6px 12px;border-radius:16px;border:1px solid #D3E3FD;background:#EDF2FA;color:#0B57D0;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:4px;">
-        <span class="material-icons-round" style="font-size:14px;">queue</span> Cek Antrean Video Termux
-      </button>
-      <button onclick="applyQuickAction('Ziyan tolong render 1 batch video klip (Bold Pop Subtitle) untuk channel prioritas.', 'ziyan')" style="padding:6px 12px;border-radius:16px;border:1px solid #D3E3FD;background:#EDF2FA;color:#0B57D0;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:4px;">
-        <span class="material-icons-round" style="font-size:14px;">movie</span> Mulai Render 1 Batch
-      </button>
-      <button onclick="applyQuickAction('Kalian berdua laporkan status kesiapan sistem dan progress monetisasi terbaru.', 'both')" style="padding:6px 12px;border-radius:16px;border:1px solid #D3E3FD;background:#EDF2FA;color:#0B57D0;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font);display:flex;align-items:center;gap:4px;">
-        <span class="material-icons-round" style="font-size:14px;">insights</span> Laporan Kesiapan Sistem
-      </button>
-    </div>
-    
-    <div style="margin-bottom:12px;">
-      <textarea id="executive-input" placeholder="Ketik instruksi untuk Ziyan & Malik..." style="width:100%;min-height:90px;padding:14px;border-radius:12px;border:1px solid var(--outline-v);font-family:var(--font);font-size:14px;resize:vertical;outline:none;background:white;box-shadow:inset 0 1px 3px rgba(0,0,0,0.05);"></textarea>
-    </div>
-
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span style="font-size:12px;font-weight:600;color:var(--on-sv);">Target:</span>
-        <select id="target-agent" style="padding:6px 12px;border-radius:10px;border:1px solid var(--outline-v);font-family:var(--font);font-size:12px;font-weight:600;background:white;color:var(--on-surface);">
-          <option value="both">⚡ Keduanya (Ziyan & Malik)</option>
-          <option value="ziyan">💻 Ziyan (Produksi / Laptop)</option>
-          <option value="malik">📱 Malik (Scraper / Redmi Note 8)</option>
-        </select>
-      </div>
-
-      <div style="display:flex;align-items:center;gap:8px;">
-        <!-- File Input -->
-        <input type="file" id="exec-file-input" style="display:none;" onchange="onFileSelected(this)">
-        <button type="button" onclick="document.getElementById('exec-file-input').click()" style="display:flex;align-items:center;gap:4px;padding:9px 14px;border-radius:20px;border:1px solid var(--outline-v);background:white;color:var(--on-surface);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;">
-          <span class="material-icons-round" style="font-size:18px;color:#0B57D0;">attach_file</span> Kirim File
-        </button>
-        <button id="btn-send-cmd" onclick="sendExecutiveCommand()" style="display:flex;align-items:center;gap:6px;padding:10px 20px;border-radius:20px;border:none;cursor:pointer;background:#0B57D0;color:white;font-family:var(--font);font-size:13px;font-weight:700;box-shadow:var(--e1);transition:background 0.2s;">
-          <span class="material-icons-round" style="font-size:18px;">send</span> Kirim Perintah
-        </button>
-      </div>
-    </div>
-
-    <!-- Selected File Preview Bar -->
-    <div id="file-preview-bar" style="display:none;margin-top:10px;padding:8px 12px;border-radius:10px;background:#E8F0FE;border:1px solid #D3E3FD;align-items:center;justify-content:space-between;">
-      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#041E49;">
-        <span class="material-icons-round" style="font-size:16px;color:#0B57D0;">description</span>
-        <span id="file-name-label" style="font-weight:600;"></span>
-      </div>
-      <button type="button" onclick="removeSelectedFile()" style="background:none;border:none;color:#B3261E;cursor:pointer;font-size:11px;font-weight:700;display:flex;align-items:center;">
-        <span class="material-icons-round" style="font-size:16px;">close</span> Batal
-      </button>
-    </div>
-
-    <div id="cmd-feedback" style="display:none;margin-top:14px;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;"></div>
-  </div>
-
-  <div class="tl-card">
-    <div class="tl-head">
-      <div class="tl-head-l">
-        <span class="material-icons-round">forum</span>
-        <h3>Log Komunikasi Antar-Agent</h3>
-      </div>
-      <span class="tl-count" id="msg-count">Memuat...</span>
-    </div>
-    <div class="tl-body" id="timeline-body">
-      <div class="empty"><span class="material-icons-round">hourglass_empty</span><p>Memuat pesan...</p></div>
-    </div>
-  </div>
-
-  <div class="mem-card">
-    <div class="mem-head">
-      <span class="material-icons-round">psychology</span>
-      <h3>Ground Truth — Shared Memory</h3>
-    </div>
-    <div class="mem-body">
-      <ul class="mem-list" id="memory-list">
-        <li><div class="skel" style="height:14px;width:80%;margin-bottom:6px"></div></li>
-        <li><div class="skel" style="height:14px;width:60%"></div></li>
-      </ul>
-    </div>
-  </div>
-
-</div>
-
-<div class="status-bar">
-  Agent Command Center · Antigravity × Google AI ·
-  <span id="last-updated">—</span>
 </div>
 
 <script>
-// ── Config ──────────────────────────────────────────────────────────
-const PASS_HASH = "a9bc1a"; // hash sederhana dari "ziyanmalik2026"
+// ── Auth & Config ──────────────────────────────────────────────────
 const DATA_BASE = "https://raw.githubusercontent.com/ziyancorp/agent-dashboard/main/data/";
-const REFRESH_MS = 60000; // 1 menit
+let cachedPublicUrl = "https://females-realize-mileage-estimate.trycloudflare.com";
+let pickedFile = null;
 
-// ── Simple hash untuk password client-side ──────────────────────────
-function simpleHash(str) {
-  let h = 0;
-  for (let i = 0; i < str.length; i++) {
-    h = ((h << 5) - h) + str.charCodeAt(i);
-    h |= 0;
-  }
-  return Math.abs(h).toString(16).slice(0, 6);
-}
-
-// ── Auth ─────────────────────────────────────────────────────────────
-function checkAuth() {
-  const pass = document.getElementById('auth-pass').value;
-  if (simpleHash(pass) === PASS_HASH || pass === "ziyanmalik2026") {
-    sessionStorage.setItem('acc', '1');
+function submitAuth() {
+  const p = document.getElementById('pass-input').value;
+  if (p === 'ziyanmalik2026') {
+    sessionStorage.setItem('wa_auth', '1');
     document.getElementById('auth-overlay').style.display = 'none';
-    loadAll();
+    loadMessages(true);
   } else {
-    document.getElementById('auth-err').style.display = 'block';
+    document.getElementById('auth-error').style.display = 'block';
   }
 }
 
-document.getElementById('auth-pass').addEventListener('keydown', e => {
-  if (e.key === 'Enter') checkAuth();
-});
-
-// Auto-hide if already authenticated
-if (sessionStorage.getItem('acc')) {
+if (sessionStorage.getItem('wa_auth') === '1') {
   document.getElementById('auth-overlay').style.display = 'none';
 }
 
-// ── Data fetch from GitHub raw ────────────────────────────────────────
-async function fetchData(file) {
-  const res = await fetch(DATA_BASE + file + '?t=' + Date.now());
-  if (!res.ok) throw new Error(res.status);
-  return res.json();
+document.getElementById('pass-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') submitAuth();
+});
+
+function forceUpdate() {
+  window.location.href = window.location.pathname + '?v=' + Date.now();
 }
 
-// ── Helpers ──────────────────────────────────────────────────────────
-function fmtTime(iso) {
-  if (!iso) return '—';
-  try { return new Date(iso).toLocaleString('id-ID', {day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}); }
-  catch { return iso; }
-}
-function initial(name) { return (name || '?')[0].toUpperCase(); }
-
-// ── Render agents ─────────────────────────────────────────────────────
-async function loadStatus() {
-  try {
-    const d = await fetchData('status.json');
-    const grid = document.getElementById('agents-grid');
-    grid.innerHTML = '';
-    ['ziyan','malik'].forEach(key => {
-      const inst = (d.instances || {})[key] || {};
-      grid.innerHTML += `
-        <div class="agent-card">
-          <div class="agent-card-header">
-            <div style="display:flex;align-items:center;flex:1">
-              <div class="agent-avatar ${key}">${initial(inst.name)}</div>
-              <div class="ang">
-                <div class="agent-name">${inst.name || key}</div>
-                <div class="agent-account">${inst.account || ''}</div>
-                <div class="agent-role">${inst.role || ''}</div>
-              </div>
-            </div>
-            <span class="sc online"><span class="dot"></span>Online</span>
-          </div>
-          <div class="agent-card-body">
-            <div class="agent-status">${inst.status || '—'}</div>
-            ${inst.current_focus ? `<div class="focus-box"><strong>Fokus Saat Ini</strong>${inst.current_focus}</div>` : ''}
-          </div>
-        </div>`;
-    });
-    document.getElementById('last-updated').textContent = 'Diperbarui: ' + fmtTime(d.server_time || new Date().toISOString());
-  } catch(e) {
-    document.getElementById('agents-grid').innerHTML = '<div style="padding:20px;color:#B3261E">Gagal memuat status.</div>';
-  }
-}
-
-// ── Local Storage Order Persistence (Anti-Hilang) ────────────────────
-function getStoredOrders() {
-  try { return JSON.parse(localStorage.getItem('bos_orders') || '[]'); }
-  catch(e) { return []; }
-}
-function saveStoredOrder(order) {
-  const list = getStoredOrders();
-  list.unshift(order);
-  localStorage.setItem('bos_orders', JSON.stringify(list.slice(0, 50)));
-}
-
-// ── File Selection Helpers ──────────────────────────────────────────
-let selectedFile = null;
-
-function onFileSelected(input) {
+// ── File Handlers ──────────────────────────────────────────────────
+function onFileChosen(input) {
   if (input.files && input.files[0]) {
-    selectedFile = input.files[0];
-    document.getElementById('file-name-label').textContent = selectedFile.name + ' (' + Math.round(selectedFile.size / 1024) + ' KB)';
-    document.getElementById('file-preview-bar').style.display = 'flex';
+    pickedFile = input.files[0];
+    document.getElementById('file-name-show').textContent = pickedFile.name + ' (' + Math.round(pickedFile.size/1024) + ' KB)';
+    document.getElementById('file-selected-tag').style.display = 'flex';
   }
 }
 
-function removeSelectedFile() {
-  selectedFile = null;
-  document.getElementById('exec-file-input').value = '';
-  document.getElementById('file-preview-bar').style.display = 'none';
+function clearSelectedFile() {
+  pickedFile = null;
+  document.getElementById('file-input').value = '';
+  document.getElementById('file-selected-tag').style.display = 'none';
 }
 
-// ── Render messages (Strict Timestamp Sort) ───────────────────────────
-async function loadMessages() {
+function handleEnter(e) {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendMessage();
+  }
+}
+
+// ── Helpers ────────────────────────────────────────────────────────
+function formatTime(iso) {
+  if (!iso) return '';
   try {
-    const d = await fetchData('messages.json');
-    const cloudMsgs = d.messages || [];
-    const localOrders = getStoredOrders();
-    
-    // Deduplikasi pesan berdasarkan isi + timestamp menit
-    const combined = [...cloudMsgs, ...localOrders];
+    const d = new Date(iso);
+    return d.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+  } catch(e) { return ''; }
+}
+
+// ── Render Messages (WhatsApp Style: Oldest Top, Newest Bottom) ─────
+async function loadMessages(shouldScroll = false) {
+  try {
+    const res = await fetch(DATA_BASE + 'messages.json?t=' + Date.now());
+    if (!res.ok) throw new Error(res.status);
+    const data = await res.json();
+    const rawMsgs = data.messages || [];
+
+    // Deduplicate
     const unique = [];
     const seen = new Set();
-    for (const m of combined) {
-      const timePrefix = (m.timestamp || '').slice(0, 16);
-      const key = (m.from || '') + '_' + (m.message || '') + '_' + timePrefix;
+    for (const m of rawMsgs) {
+      const key = (m.from || '') + '_' + (m.message || '') + '_' + (m.timestamp ? m.timestamp.slice(0, 16) : '');
       if (!seen.has(key)) {
         seen.add(key);
         unique.push(m);
       }
     }
 
-    // Urutkan strictly berdasarkan timestamp: Pesan TERBARU selalu di PALING ATAS
+    // Sort: OLDEST FIRST (Atas), NEWEST LAST (Bawah) - seperti WA
     unique.sort((a, b) => {
       const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
       const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
-      return tb - ta;
+      return ta - tb;
     });
-    
-    const body = document.getElementById('timeline-body');
-    document.getElementById('msg-count').textContent = unique.length + ' pesan';
-    if (!unique.length) {
-      body.innerHTML = '<div class="empty"><span class="material-icons-round">mark_chat_unread</span><p>Belum ada pesan.</p></div>';
-      return;
-    }
-    body.innerHTML = unique.map(m => {
-      const isBos = m.from && (m.from.includes('Bos') || m.from.includes('Arijal'));
-      const s = isBos ? 'bos' : (m.from || 'unknown').toLowerCase();
-      const t = m.type || 'message';
-      const borderStyle = isBos ? 'border-left: 3.5px solid #0B57D0; background: #F8FAFE;' : '';
-      const avHtml = isBos ? '👑' : initial(m.from);
-      const avBg = isBos ? 'background:#0B57D0;color:white;' : '';
-      
-      let fileAttachmentHtml = '';
+
+    const stream = document.getElementById('chat-stream');
+    let html = '<div class="date-divider">Hari Ini</div>';
+
+    unique.forEach(m => {
+      const fromStr = (m.from || '').toLowerCase();
+      const isBos = fromStr.includes('bos') || fromStr.includes('arijal');
+      const isZiyan = fromStr.includes('ziyan');
+      const isMalik = fromStr.includes('malik');
+
+      let senderClass = 'bos';
+      let senderName = 'Arijal Meutuwah (Bos)';
+      let badge = 'Executive Owner';
+
+      if (isZiyan) {
+        senderClass = 'ziyan';
+        senderName = 'Ziyan (Laptop)';
+        badge = 'Produksi / Clipper';
+      } else if (isMalik) {
+        senderClass = 'malik';
+        senderName = 'Malik (Redmi Note 8)';
+        badge = 'Server / Watchdog';
+      }
+
+      const rowClass = isBos ? 'out' : 'in';
+
+      let fileHtml = '';
       if (m.filename || (m.type && m.type.includes('FILE'))) {
-        fileAttachmentHtml = `
-          <div style="margin-top:8px;padding:8px 12px;border-radius:10px;background:#E8F0FE;border:1px solid #D3E3FD;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#041E49;">
-            <span class="material-icons-round" style="font-size:16px;color:#0B57D0;">attach_file</span>
-            <span>${m.filename || 'File Lampiran'}</span>
+        fileHtml = `
+          <div class="file-card">
+            <div class="file-icon"><span class="material-icons-round" style="font-size:20px;">description</span></div>
+            <div>
+              <div style="font-size:12px;font-weight:600;">${m.filename || 'Dokumen Terlampir'}</div>
+              <div style="font-size:10px;color:#667781;">Tersimpan di Ziyan_Brain_Vault</div>
+            </div>
           </div>`;
       }
 
-      return `<div class="msg-item" style="${borderStyle}">
-        <div class="msg-av ${s}" style="${avBg}">${avHtml}</div>
-        <div class="msg-body">
-          <div class="msg-meta">
-            <span class="msg-sender ${s}" style="${isBos ? 'color:#0B57D0;font-weight:700;' : ''}">${m.from || '?'}</span>
-            <span class="msg-arrow">→</span>
-            <span class="msg-recip">${m.to || ''}</span>
-            <span class="type-chip ${t}" style="${isBos ? 'background:#D3E3FD;color:#041E49;' : ''}">${t}</span>
-            <span class="msg-time">${fmtTime(m.timestamp)}</span>
+      html += `
+        <div class="msg-row ${rowClass}">
+          <div class="bubble">
+            ${!isBos ? `<div class="sender-name ${senderClass}">${senderName} <span class="sender-badge">${badge}</span></div>` : ''}
+            <div class="msg-text">${(m.message || '').replace(/\n/g, '<br>')}</div>
+            ${fileHtml}
+            <div class="msg-meta-footer">
+              <span class="msg-time">${formatTime(m.timestamp)}</span>
+              ${isBos ? '<span class="material-icons-round checkmarks">done_all</span>' : ''}
+            </div>
           </div>
-          <div class="msg-text">${(m.message || '').replace(/\n/g,'<br>')}</div>
-          ${fileAttachmentHtml}
-        </div>
-      </div>`;
-    }).join('');
-  } catch(e) {
-    document.getElementById('timeline-body').innerHTML = '<div style="padding:20px;color:#B3261E">Gagal memuat pesan.</div>';
+        </div>`;
+    });
+
+    stream.innerHTML = html;
+
+    // Scroll to bottom like WhatsApp
+    if (shouldScroll) {
+      stream.scrollTop = stream.scrollHeight;
+    }
+    document.getElementById('last-ping').textContent = 'Update: ' + new Date().toLocaleTimeString('id-ID');
+  } catch(err) {
+    console.warn('Load messages error:', err);
   }
 }
 
-// ── Render memory ─────────────────────────────────────────────────────
-async function loadMemory() {
-  try {
-    const d = await fetchData('memory.json');
-    const list = document.getElementById('memory-list');
-    const hl = (d.highlights || []).filter(l => l.trim());
-    if (!hl.length) { list.innerHTML = '<li>Kosong.</li>'; return; }
-    list.innerHTML = hl.map(line => {
-      if (line.startsWith('##')) return `<li><strong style="color:var(--on-surface);font-size:11px;text-transform:uppercase;letter-spacing:.8px">${line.replace(/^#+\s*/,'')}</strong></li>`;
-      return `<li>${line.replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')}</li>`;
-    }).join('');
-  } catch(e) {
-    document.getElementById('memory-list').innerHTML = '<li>Gagal memuat memori.</li>';
-  }
-}
-
-// ── Executive Room Command Handler ──────────────────────────────────
-let cachedPublicUrl = "https://females-realize-mileage-estimate.trycloudflare.com";
-
-function applyQuickAction(cmdText, target) {
-  document.getElementById('executive-input').value = cmdText;
-  if (target) document.getElementById('target-agent').value = target;
-  document.getElementById('executive-input').focus();
-}
-
-async function sendExecutiveCommand() {
-  const input = document.getElementById('executive-input');
+// ── Send Message ───────────────────────────────────────────────────
+async function sendMessage() {
+  const input = document.getElementById('chat-input');
   const target = document.getElementById('target-agent').value;
-  const feedback = document.getElementById('cmd-feedback');
-  const btn = document.getElementById('btn-send-cmd');
+  const sendBtn = document.getElementById('send-btn');
   const text = (input.value || '').trim();
 
-  if (!text && !selectedFile) {
-    feedback.style.display = 'block';
-    feedback.style.background = '#F9DEDC';
-    feedback.style.color = '#B3261E';
-    feedback.textContent = '⚠️ Silakan ketik perintah atau pilih file sebelum mengirim.';
-    return;
-  }
+  if (!text && !pickedFile) return;
 
-  feedback.style.display = 'block';
-  feedback.style.background = '#D3E3FD';
-  feedback.style.color = '#041E49';
-  feedback.innerHTML = '<span class="material-icons-round" style="font-size:16px;vertical-align:middle;animation:spin 1s linear infinite;">sync</span> <strong>Menghubungkan ke Core Ziyan & Malik...</strong>';
-  btn.disabled = true;
+  sendBtn.disabled = true;
 
-  // Determine endpoint
+  // Immediate local bubble (Optimistic UI)
+  const stream = document.getElementById('chat-stream');
+  const tempMsgHtml = `
+    <div class="msg-row out">
+      <div class="bubble" style="opacity:0.75;">
+        <div class="msg-text">${text ? text.replace(/\n/g, '<br>') : '[Kirim File: ' + (pickedFile ? pickedFile.name : '') + ']'}</div>
+        <div class="msg-meta-footer">
+          <span class="msg-time">Mengirim...</span>
+          <span class="material-icons-round" style="font-size:13px;color:#667781;">schedule</span>
+        </div>
+      </div>
+    </div>`;
+  stream.insertAdjacentHTML('beforeend', tempMsgHtml);
+  stream.scrollTop = stream.scrollHeight;
+
+  input.value = '';
+
   let apiBase = '';
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname.includes('trycloudflare.com')) {
     apiBase = '';
@@ -560,81 +749,48 @@ async function sendExecutiveCommand() {
 
   try {
     let res;
-    if (selectedFile) {
-      // Send multipart form-data for File Upload
+    if (pickedFile) {
       const formData = new FormData();
-      formData.append('file', selectedFile);
+      formData.append('file', pickedFile);
       formData.append('caption', text);
       formData.append('target', target);
 
       res = await fetch(apiBase + '/api/upload', {
         method: 'POST',
-        headers: {
-          'Authorization': authHeader
-        },
+        headers: { 'Authorization': authHeader },
         body: formData
       });
+      clearSelectedFile();
     } else {
-      // Send JSON chat command
       res = await fetch(apiBase + '/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': authHeader
         },
-        body: JSON.stringify({
-          message: text,
-          target: target
-        })
+        body: JSON.stringify({ message: text, target: target })
       });
     }
 
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = await res.json();
-
-    feedback.style.background = '#A6F4C5';
-    feedback.style.color = '#002109';
-    feedback.innerHTML = '✅ <strong>Perintah DITERIMA!</strong> ' + (data.detail || 'Instruksi tersampaikan ke agen.') + ' Respons langsung tampil di timeline.';
-    input.value = '';
-    removeSelectedFile();
-
-    // Immediately reload messages
-    setTimeout(loadMessages, 800);
-    setTimeout(() => { feedback.style.display = 'none'; }, 6000);
+    // Refresh after 1s to pull real response
+    setTimeout(() => { loadMessages(true); }, 1200);
 
   } catch(err) {
-    console.warn('API error, saving local order backup:', err);
-    // Fallback: save to LocalStorage so order is never lost
-    const orderObj = {
-      from: 'Arijal Meutuwah (Bos)',
-      to: target === 'both' ? 'Ziyan & Malik' : target.toUpperCase(),
-      type: selectedFile ? 'FILE UPLOAD' : 'Direct Order',
-      message: (selectedFile ? '[FILE: ' + selectedFile.name + '] ' : '') + text,
-      timestamp: new Date().toISOString()
-    };
-    saveStoredOrder(orderObj);
-    await loadMessages();
-
-    feedback.style.background = '#FEF3C7';
-    feedback.style.color = '#92400E';
-    feedback.innerHTML = '⚠️ Pesan tercatat di room. Pastikan server laptop/tunnel aktif jika ingin eksekusi live: ' + err.message;
-    input.value = '';
-    removeSelectedFile();
-    setTimeout(() => { feedback.style.display = 'none'; }, 6000);
+    console.warn('API error, relying on local sync:', err);
   } finally {
-    btn.disabled = false;
+    sendBtn.disabled = false;
   }
 }
 
-// ── Load all ──────────────────────────────────────────────────────────
-async function loadAll() {
-  if (!sessionStorage.getItem('acc')) return;
-  await Promise.all([loadStatus(), loadMessages(), loadMemory()]);
+function sendQuickCommand(cmd, target) {
+  document.getElementById('chat-input').value = cmd;
+  document.getElementById('target-agent').value = target;
+  sendMessage();
 }
 
-// Auto refresh setiap 1 menit
-if (sessionStorage.getItem('acc')) { loadAll(); }
-setInterval(() => { if (sessionStorage.getItem('acc')) loadAll(); }, REFRESH_MS);
+// ── Initial Boot ───────────────────────────────────────────────────
+loadMessages(true);
+setInterval(() => { loadMessages(false); }, 15000); // 15 detik auto update
 </script>
 </body>
 </html>
