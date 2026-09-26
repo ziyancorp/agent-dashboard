@@ -252,10 +252,26 @@
       </div>
 
       <div style="display:flex;align-items:center;gap:8px;">
+        <!-- File Input -->
+        <input type="file" id="exec-file-input" style="display:none;" onchange="onFileSelected(this)">
+        <button type="button" onclick="document.getElementById('exec-file-input').click()" style="display:flex;align-items:center;gap:4px;padding:9px 14px;border-radius:20px;border:1px solid var(--outline-v);background:white;color:var(--on-surface);cursor:pointer;font-family:var(--font);font-size:12px;font-weight:600;">
+          <span class="material-icons-round" style="font-size:18px;color:#0B57D0;">attach_file</span> Kirim File
+        </button>
         <button id="btn-send-cmd" onclick="sendExecutiveCommand()" style="display:flex;align-items:center;gap:6px;padding:10px 20px;border-radius:20px;border:none;cursor:pointer;background:#0B57D0;color:white;font-family:var(--font);font-size:13px;font-weight:700;box-shadow:var(--e1);transition:background 0.2s;">
           <span class="material-icons-round" style="font-size:18px;">send</span> Kirim Perintah
         </button>
       </div>
+    </div>
+
+    <!-- Selected File Preview Bar -->
+    <div id="file-preview-bar" style="display:none;margin-top:10px;padding:8px 12px;border-radius:10px;background:#E8F0FE;border:1px solid #D3E3FD;align-items:center;justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:#041E49;">
+        <span class="material-icons-round" style="font-size:16px;color:#0B57D0;">description</span>
+        <span id="file-name-label" style="font-weight:600;"></span>
+      </div>
+      <button type="button" onclick="removeSelectedFile()" style="background:none;border:none;color:#B3261E;cursor:pointer;font-size:11px;font-weight:700;display:flex;align-items:center;">
+        <span class="material-icons-round" style="font-size:16px;">close</span> Batal
+      </button>
     </div>
 
     <div id="cmd-feedback" style="display:none;margin-top:14px;padding:12px 16px;border-radius:10px;font-size:13px;font-weight:500;"></div>
@@ -390,23 +406,57 @@ function saveStoredOrder(order) {
   localStorage.setItem('bos_orders', JSON.stringify(list.slice(0, 50)));
 }
 
-// ── Render messages ───────────────────────────────────────────────────
+// ── File Selection Helpers ──────────────────────────────────────────
+let selectedFile = null;
+
+function onFileSelected(input) {
+  if (input.files && input.files[0]) {
+    selectedFile = input.files[0];
+    document.getElementById('file-name-label').textContent = selectedFile.name + ' (' + Math.round(selectedFile.size / 1024) + ' KB)';
+    document.getElementById('file-preview-bar').style.display = 'flex';
+  }
+}
+
+function removeSelectedFile() {
+  selectedFile = null;
+  document.getElementById('exec-file-input').value = '';
+  document.getElementById('file-preview-bar').style.display = 'none';
+}
+
+// ── Render messages (Strict Timestamp Sort) ───────────────────────────
 async function loadMessages() {
   try {
     const d = await fetchData('messages.json');
-    const cloudMsgs = (d.messages || []).slice().reverse();
+    const cloudMsgs = d.messages || [];
     const localOrders = getStoredOrders();
     
-    // Gabungkan pesan cloud dengan perintah Bos yang tersimpan lokal (Anti-Terhapus)
-    const allMsgs = [...localOrders, ...cloudMsgs];
+    // Deduplikasi pesan berdasarkan isi + timestamp menit
+    const combined = [...cloudMsgs, ...localOrders];
+    const unique = [];
+    const seen = new Set();
+    for (const m of combined) {
+      const timePrefix = (m.timestamp || '').slice(0, 16);
+      const key = (m.from || '') + '_' + (m.message || '') + '_' + timePrefix;
+      if (!seen.has(key)) {
+        seen.add(key);
+        unique.push(m);
+      }
+    }
+
+    // Urutkan strictly berdasarkan timestamp: Pesan TERBARU selalu di PALING ATAS
+    unique.sort((a, b) => {
+      const ta = a.timestamp ? new Date(a.timestamp).getTime() : 0;
+      const tb = b.timestamp ? new Date(b.timestamp).getTime() : 0;
+      return tb - ta;
+    });
     
     const body = document.getElementById('timeline-body');
-    document.getElementById('msg-count').textContent = allMsgs.length + ' pesan';
-    if (!allMsgs.length) {
+    document.getElementById('msg-count').textContent = unique.length + ' pesan';
+    if (!unique.length) {
       body.innerHTML = '<div class="empty"><span class="material-icons-round">mark_chat_unread</span><p>Belum ada pesan.</p></div>';
       return;
     }
-    body.innerHTML = allMsgs.map(m => {
+    body.innerHTML = unique.map(m => {
       const isBos = m.from && (m.from.includes('Bos') || m.from.includes('Arijal'));
       const s = isBos ? 'bos' : (m.from || 'unknown').toLowerCase();
       const t = m.type || 'message';
@@ -414,6 +464,15 @@ async function loadMessages() {
       const avHtml = isBos ? '👑' : initial(m.from);
       const avBg = isBos ? 'background:#0B57D0;color:white;' : '';
       
+      let fileAttachmentHtml = '';
+      if (m.filename || (m.type && m.type.includes('FILE'))) {
+        fileAttachmentHtml = `
+          <div style="margin-top:8px;padding:8px 12px;border-radius:10px;background:#E8F0FE;border:1px solid #D3E3FD;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#041E49;">
+            <span class="material-icons-round" style="font-size:16px;color:#0B57D0;">attach_file</span>
+            <span>${m.filename || 'File Lampiran'}</span>
+          </div>`;
+      }
+
       return `<div class="msg-item" style="${borderStyle}">
         <div class="msg-av ${s}" style="${avBg}">${avHtml}</div>
         <div class="msg-body">
@@ -425,6 +484,7 @@ async function loadMessages() {
             <span class="msg-time">${fmtTime(m.timestamp)}</span>
           </div>
           <div class="msg-text">${(m.message || '').replace(/\n/g,'<br>')}</div>
+          ${fileAttachmentHtml}
         </div>
       </div>`;
     }).join('');
@@ -465,11 +525,11 @@ async function sendExecutiveCommand() {
   const btn = document.getElementById('btn-send-cmd');
   const text = (input.value || '').trim();
 
-  if (!text) {
+  if (!text && !selectedFile) {
     feedback.style.display = 'block';
     feedback.style.background = '#F9DEDC';
     feedback.style.color = '#B3261E';
-    feedback.textContent = '⚠️ Silakan ketik perintah terlebih dahulu sebelum mengirim.';
+    feedback.textContent = '⚠️ Silakan ketik perintah atau pilih file sebelum mengirim.';
     return;
   }
 
@@ -490,17 +550,35 @@ async function sendExecutiveCommand() {
   const authHeader = 'Basic ' + btoa('bos:ziyanmalik2026');
 
   try {
-    const res = await fetch(apiBase + '/api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': authHeader
-      },
-      body: JSON.stringify({
-        message: text,
-        target: target
-      })
-    });
+    let res;
+    if (selectedFile) {
+      // Send multipart form-data for File Upload
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('caption', text);
+      formData.append('target', target);
+
+      res = await fetch(apiBase + '/api/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': authHeader
+        },
+        body: formData
+      });
+    } else {
+      // Send JSON chat command
+      res = await fetch(apiBase + '/api/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': authHeader
+        },
+        body: JSON.stringify({
+          message: text,
+          target: target
+        })
+      });
+    }
 
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
@@ -509,6 +587,7 @@ async function sendExecutiveCommand() {
     feedback.style.color = '#002109';
     feedback.innerHTML = '✅ <strong>Perintah DITERIMA!</strong> ' + (data.detail || 'Instruksi tersampaikan ke agen.') + ' Respons langsung tampil di timeline.';
     input.value = '';
+    removeSelectedFile();
 
     // Immediately reload messages
     setTimeout(loadMessages, 800);
@@ -520,8 +599,8 @@ async function sendExecutiveCommand() {
     const orderObj = {
       from: 'Arijal Meutuwah (Bos)',
       to: target === 'both' ? 'Ziyan & Malik' : target.toUpperCase(),
-      type: 'Direct Order',
-      message: text,
+      type: selectedFile ? 'FILE UPLOAD' : 'Direct Order',
+      message: (selectedFile ? '[FILE: ' + selectedFile.name + '] ' : '') + text,
       timestamp: new Date().toISOString()
     };
     saveStoredOrder(orderObj);
@@ -529,8 +608,9 @@ async function sendExecutiveCommand() {
 
     feedback.style.background = '#FEF3C7';
     feedback.style.color = '#92400E';
-    feedback.innerHTML = '⚠️ Perintah tercatat di room. Pastikan server laptop/tunnel aktif jika ingin eksekusi live.';
+    feedback.innerHTML = '⚠️ Pesan tercatat di room. Pastikan server laptop/tunnel aktif jika ingin eksekusi live: ' + err.message;
     input.value = '';
+    removeSelectedFile();
     setTimeout(() => { feedback.style.display = 'none'; }, 6000);
   } finally {
     btn.disabled = false;
