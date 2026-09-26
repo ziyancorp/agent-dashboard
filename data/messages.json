@@ -223,6 +223,48 @@
                          "message":  "Ziyan siap berproses dari sini, Bos! Pipeline clipper di laptop dan queue di Redmi Note 8 siap menerima komando dan file dari room eksekutif ini secara penuh.",
                          "type":  "Executive Response",
                          "timestamp":  "2026-09-27T03:14:36.2936439+07:00"
+                     },
+                     {
+                         "from":  "Arijal Meutuwah (Bos)",
+                         "to":  "Ziyan \u0026 Malik",
+                         "timestamp":  "2026-09-27T03:20:49.246780",
+                         "type":  "DIRECT ORDER",
+                         "message":  "Salah satu dari kalian tolong pelajari video ini dan uraikan disini."
+                     },
+                     {
+                         "from":  "Ziyan",
+                         "to":  "Arijal Meutuwah (Bos)",
+                         "timestamp":  "2026-09-27T03:20:49.247168",
+                         "type":  "Executive Response",
+                         "message":  "Instruksi diterima Bos: \u0027Salah satu dari kalian tolong pelajari video ini dan uraikan disini.\u0027. Core produksi laptop siap memproses."
+                     },
+                     {
+                         "from":  "Malik",
+                         "to":  "Arijal Meutuwah (Bos)",
+                         "timestamp":  "2026-09-27T03:20:49.247173",
+                         "type":  "Executive Response",
+                         "message":  "Siap Bos! Malik mencatat instruksi: \u0027Salah satu dari kalian tolong pelajari video ini dan uraikan disini.\u0027. Server Redmi Note 8 \u0026 monitoring mengawal."
+                     },
+                     {
+                         "from":  "Arijal Meutuwah (Bos)",
+                         "to":  "Ziyan \u0026 Malik",
+                         "timestamp":  "2026-09-27T03:20:49.945312",
+                         "type":  "DIRECT ORDER",
+                         "message":  "https://youtu.be/wEEi2bCuZGQ?si=4JqITmoQHC-3S-N4"
+                     },
+                     {
+                         "from":  "Ziyan",
+                         "to":  "Arijal Meutuwah (Bos)",
+                         "timestamp":  "2026-09-27T03:20:49.953567",
+                         "type":  "Executive Response",
+                         "message":  "Instruksi diterima Bos: \u0027https://youtu.be/wEEi2bCuZGQ?si=4JqITmoQHC-3S-N4\u0027. Core produksi laptop siap memproses."
+                     },
+                     {
+                         "from":  "Malik",
+                         "to":  "Arijal Meutuwah (Bos)",
+                         "timestamp":  "2026-09-27T03:20:49.953577",
+                         "type":  "Executive Response",
+                         "message":  "Siap Bos! Malik mencatat instruksi: \u0027https://youtu.be/wEEi2bCuZGQ?si=4JqITmoQHC-3S-N4\u0027. Server Redmi Note 8 \u0026 monitoring mengawal."
                      }
                  ]
 }
