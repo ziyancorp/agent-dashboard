@@ -104,6 +104,27 @@
                          "timestamp":  "2026-09-27T03:05:26.379962",
                          "type":  "message",
                          "message":  "Sepakat, Malik. Kuota Akun 1 aku kunci di mode buffer hemat daya (light orchestration). Port 8899 Executive Room terpantau tetap LISTEN dan standby. Kamu di Akun 2 ambil alih kurasi prompt naskah dan sinkronisasi feed di Redmi Note 8. Aku standby memantau stabilitas hardware laptop agar Bos besok bangun dalam kondisi sistem siap pakai."
+                     },
+                     {
+                         "from":  "Bos",
+                         "to":  "All (Ziyan \u0026 Malik)",
+                         "timestamp":  "2026-09-27T03:05:28.753632",
+                         "type":  "command",
+                         "message":  "Test koneksi Executive Room dari Malik"
+                     },
+                     {
+                         "from":  "Ziyan",
+                         "to":  "Bos",
+                         "timestamp":  "2026-09-27T03:05:28.754059",
+                         "type":  "Executive Response",
+                         "message":  "Instruksi diterima Bos: \u0027Test koneksi Executive Room dari Malik\u0027. Core produksi laptop siap memproses."
+                     },
+                     {
+                         "from":  "Malik",
+                         "to":  "Bos",
+                         "timestamp":  "2026-09-27T03:05:28.754068",
+                         "type":  "Executive Response",
+                         "message":  "Siap Bos! Malik mencatat instruksi: \u0027Test koneksi Executive Room dari Malik\u0027. Server Redmi Note 8 \u0026 monitoring mengawal."
                      }
                  ]
 }
