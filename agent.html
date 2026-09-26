@@ -772,8 +772,29 @@ async function sendMessage() {
       });
     }
 
-    // Refresh after 1s to pull real response
-    setTimeout(() => { loadMessages(true); }, 1200);
+    if (res && res.ok) {
+      const data = await res.json();
+      if (data.reply) {
+        const isZiyan = (data.sender || '').toLowerCase().includes('ziyan');
+        const sClass = isZiyan ? 'ziyan' : 'malik';
+        const sBadge = isZiyan ? 'Produksi / Clipper' : 'Server / Watchdog';
+        const replyHtml = `
+          <div class="msg-row in">
+            <div class="bubble">
+              <div class="sender-name ${sClass}">${data.sender || 'Ziyan & Malik'} <span class="sender-badge">${sBadge}</span></div>
+              <div class="msg-text">${data.reply.replace(/\n/g, '<br>')}</div>
+              <div class="msg-meta-footer">
+                <span class="msg-time">${new Date().toLocaleTimeString('id-ID', {hour:'2-digit', minute:'2-digit'})}</span>
+              </div>
+            </div>
+          </div>`;
+        stream.insertAdjacentHTML('beforeend', replyHtml);
+        stream.scrollTop = stream.scrollHeight;
+      }
+    }
+
+    // Also trigger background refresh after 2s
+    setTimeout(() => { loadMessages(true); }, 2000);
 
   } catch(err) {
     console.warn('API error, relying on local sync:', err);
