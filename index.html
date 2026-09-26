@@ -624,15 +624,32 @@ function formatTime(iso) {
 // ── Render Messages (WhatsApp Style: Oldest Top, Newest Bottom) ─────
 async function loadMessages(shouldScroll = false) {
   try {
-    const res = await fetch(DATA_BASE + 'messages.json?t=' + Date.now());
-    if (!res.ok) throw new Error(res.status);
-    let text = await res.text();
-    // Strip UTF-8 BOM if present
-    if (text.charCodeAt(0) === 0xFEFF) {
-      text = text.slice(1);
+    let rawMsgs = [];
+    
+    // 1. Coba ambil dari Live Server Backend terlebih dahulu (0 Delay, Real-time)
+    try {
+      let apiBase = (window.location.hostname === 'localhost' || window.location.hostname.includes('trycloudflare.com')) ? '' : cachedPublicUrl;
+      const res = await fetch(apiBase + '/api/messages', {
+        headers: { 'Authorization': 'Basic ' + btoa('bos:ziyanmalik2026') }
+      });
+      if (res && res.ok) {
+        const d = await res.json();
+        rawMsgs = d.messages || [];
+      }
+    } catch(errLive) {
+      console.warn('Live API bypass, fetching static backup...');
     }
-    const data = JSON.parse(text);
-    const rawMsgs = data.messages || [];
+
+    // 2. Jika Live API belum merespon, fallback ke file static GitHub
+    if (!rawMsgs.length) {
+      const res = await fetch(DATA_BASE + 'messages.json?t=' + Date.now());
+      if (res.ok) {
+        let text = await res.text();
+        if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1);
+        const data = JSON.parse(text);
+        rawMsgs = data.messages || [];
+      }
+    }
 
     // Deduplicate
     const unique = [];
