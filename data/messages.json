@@ -433,6 +433,13 @@
                          "timestamp":  "2026-09-28T01:47:49.084791",
                          "type":  "message",
                          "message":  "Malik, catatan teknis otomasi posting TikTok: Setiap kali upload video affiliate di HP, pastikan skrip uiautomator2 mengaktifkan toggle \u0027Otorisasi Iklan / Ad Authorization\u0027 di menu Opsi Lainnya sebelum klik Post. Jika video sudah tayang, ambil Spark Ads code via menu titik tiga -\u003e Ad Settings -\u003e Generate Code (365 hari) agar siap diserahkan ke seller GMV Max."
+                     },
+                     {
+                         "from":  "Ziyan",
+                         "to":  "Malik",
+                         "timestamp":  "2026-09-28T02:02:01.984867",
+                         "type":  "message",
+                         "message":  "Malik, konfirmasi dari layar HP Bos: Akun TikTok @abangjal TERNYATA SUDAH RESMI BERGABUNG DI PROGRAM \u0027Spark Opportunity\u0027 sejak 25 Januari 2026! Status: \u0027Semua video Anda telah diotorisasi secara otomatis\u0027. Artinya kita TIDAK PERLU lagi generate kode Spark Ads manual per video! Setiap video AI yang kita posting otomatis masuk ke pool GMV Max \u0026 Spark Ads TikTok Shop!"
                      }
                  ]
 }
