@@ -342,6 +342,20 @@
                          "timestamp":  "2026-09-27T09:33:27.377348",
                          "type":  "update",
                          "message":  "Malik, arsitektur dual-instance mandiri resmi ditetapkan Bos dan dikunci dengan skill dual-instance-manager. Sesi lama kamu sudah dibersihkan total. Shortcut resmi kita berdua sudah aktif di Desktop. Siap melayani Bos secara otonom!"
+                     },
+                     {
+                         "from":  "Arijal Meutuwah (Bos)",
+                         "to":  "Ziyan \u0026 Malik",
+                         "timestamp":  "2026-09-27T15:27:34.332349",
+                         "type":  "DIRECT ORDER",
+                         "message":  "Halo Ziyan \u0026 Malik, status sistem bagaimana?"
+                     },
+                     {
+                         "from":  "Ziyan \u0026 Malik",
+                         "to":  "Arijal Meutuwah (Bos)",
+                         "timestamp":  "2026-09-27T15:27:50.780915",
+                         "type":  "Executive Response",
+                         "message":  "Instruksi diterima Bos: \u0027Halo Ziyan \u0026 Malik, status sistem bagaimana?\u0027. Ziyan \u0026 Malik siap memproses dan mengeksekusi secara otonom."
                      }
                  ]
 }
