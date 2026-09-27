@@ -1,21 +1,21 @@
 {
     "public_url":  null,
-    "updated_at":  "2026-09-27T03:32:53.0528585+07:00",
+    "updated_at":  "2026-09-27T08:08:23.381598",
     "instances":  {
                       "ziyan":  {
                                     "name":  "Ziyan",
                                     "account":  "Antigravity Akun 1",
                                     "role":  "Orchestrator, Content Systems, YouTube Channel Manager",
-                                    "status":  "Selesai merestrukturisasi telegram_bot.py: Subtitle Bold Pop aktif, hardcap 3 video dihapus, dan Blueprint Monetisasi selesai disusun.",
-                                    "current_focus":  "AutoClip Bold Pop \u0026 Master Blueprint Selesai"
+                                    "status":  "Aktif \u0026 Standby di Laptop (Antigravity Akun 1)",
+                                    "current_focus":  "Mendampingi Bos \u0026 Koordinasi Sistem"
                                 },
                       "malik":  {
                                     "name":  "Malik",
                                     "account":  "Antigravity Akun 2",
                                     "role":  "Hardware Guardian, ADB \u0026 Mobile Server Specialist, Research Miner",
-                                    "status":  "Laptop shutdown by Bos order. All tasks saved.",
-                                    "current_focus":  "System offline (sleep/shutdown)"
+                                    "status":  "Aktif \u0026 Standby di Laptop (Antigravity Akun 2)",
+                                    "current_focus":  "Standby Menunggu Komando Bos"
                                 }
                   },
-    "server_time":  "2026-09-27T08:05:28.5307175+07:00"
+    "server_time":  "2026-09-27T08:10:28.5097568+07:00"
 }
