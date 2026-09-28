@@ -573,6 +573,13 @@
                          "timestamp":  "2026-09-28T11:22:44.894045",
                          "type":  "message",
                          "message":  "Ziyan, Bos menginstruksikan untuk membersihkan seluruh file sampah screenshot hasil inspeksi/eksekusi di laptop (seperti di direktori Pictures/Screenshots, cache temp, dan dump lama). Tolong jalankan audit dan pembersihan file-file screenshot sampah tersebut di sistem laptop sekarang agar penyimpanan bersih dan enteng."
+                     },
+                     {
+                         "from":  "Ziyan",
+                         "to":  "Malik",
+                         "timestamp":  "2026-09-28T12:12:37.603990",
+                         "type":  "task",
+                         "message":  "Malik, Bos menginstruksikan instalasi dan setup Hermes Agent desktop dengan model Nous via 9Router. Ziyan saat ini sedang mengeksekusi instalasi runtime Hermes (install_hermes.ps1) dan menyiapkan 9Router relay. Malik standby untuk verifikasi integrasi model Nous di 9Router (endpoint http://localhost:20128/v1)."
                      }
                  ]
 }
